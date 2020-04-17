@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel="icon" href="favicon.ico">
+        <title>Frontend Toolbox Examples</title>
+        <style>
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                background-color: #cd8d7b;
+            }
+            .login__wrapper {
+                width: 350px;
+                margin: 60px auto 0;
+            }
+            login-form .avatar {
+                background-color: #084177;
+            }
+            .avatar .circle {
+                stroke: #f9fcfb;
+            }
+            .avatar .person {
+                fill: #f9fcfb;
+                stroke: #f9fcfb;
+            }
+            .msg {
+                color: #687466;
+            }
+            .login-widget button.btn {
+                background-color: #084177;
+                color: #fbc490;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="login__wrapper">
+            <login-form
+                class="login-widget"
+                heading="Welcome"
+                button-text="Sign In"
+                action="https://dev-analytics.zuarbase.net/login">
+            </login-form>
+        </div>
+        <script type="text/javascript" src="login.form.js"></script>
+    </body>
+</html>
