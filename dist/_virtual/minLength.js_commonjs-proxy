@@ -1,0 +1,1 @@
+import{__moduleExports as e}from"../node_modules/vuelidate/lib/validators/minLength.js";export default e;

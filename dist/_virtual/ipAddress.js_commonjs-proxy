@@ -1,0 +1,1 @@
+import{__moduleExports as d}from"../node_modules/vuelidate/lib/validators/ipAddress.js";export default d;

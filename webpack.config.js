@@ -5,7 +5,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 module.exports = {
     mode: 'development',
     entry: {
-        index: './src/main.js'
+        index: './src/frontend-toolbox.js'
     },
     devServer: {
         contentBase: path.join(__dirname, 'dist'),
@@ -23,7 +23,7 @@ module.exports = {
                 loader: 'vue-loader'
             },
             {
-                test: /\.scss$/,
+                test: /\.(s?)css$/,
                 use: [
                     'vue-style-loader',
                     'css-loader',
@@ -35,7 +35,7 @@ module.exports = {
     plugins: [
         new VueLoaderPlugin(),
         new HtmlWebpackPlugin({
-            template: 'src/index.html'
+            template: 'src/dev.html'
         })
     ]
 };

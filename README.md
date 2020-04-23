@@ -1,11 +1,15 @@
 # frontendtoolbox
 
 ## Dev
-* yarn install
-* yarn dev
+* `yarn install`
+* `yarn dev`
 
 ## Build for release
-* yarn build
+* `yarn build`
 
 ## Examples
-See dist/examples.html
+* `yarn examples`
+
+- or -
+
+See /dist/examples.html

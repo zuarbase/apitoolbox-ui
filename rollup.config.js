@@ -10,34 +10,50 @@ import vue from 'rollup-plugin-vue'
 // import uglify from 'rollup-plugin-uglify';
 // import postcss from 'rollup-plugin-postcss';
 
-export default {
-    input: 'src/main.js',
+const inputs = [
+    'src/frontend-toolbox.js',
+    'src/elements/LoginForm/login-form.js',
+    'src/elements/SignUpForm/sign-up-form.js',
+    'src/elements/UserAddButton/user-add-button.js',
+    'src/elements/UserList/user-list.js',
+];
+
+const plugins = [
+    // postcss({
+    //     extensions: ['.css']
+    // }),
+    replace({
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+        'process.env.BUILD': "'WEB'" // Vuelidate uses this
+    }),
+    alias({
+        entries: {
+            'vue': 'vue/dist/vue.runtime.esm.js'
+        }
+    }),
+    resolve({
+        mainFields: ['main', 'module', 'jsnext']
+    }),
+    commonjs(),
+    svg(),
+    vue({
+        compileTemplate: true
+    }),
+    // uglify(),
+    // gzip()
+    terser()
+];
+
+const config = {
     output: {
-        file: 'dist/login.form.js',
-        format: 'esm'
+        dir: 'dist',
+        format: 'iife'
     },
-    plugins: [
-        // postcss({
-        //     extensions: ['.css']
-        // }),
-        replace({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-        }),
-        alias({
-            entries: {
-                'vue': 'vue/dist/vue.runtime.esm.js'
-            }
-        }),
-        resolve({
-            mainFields: ['main', 'module' , 'jsnext']
-        }),
-        commonjs(),
-        svg(),
-        vue({
-            compileTemplate: true
-        }),
-        // uglify(),
-        // gzip()
-        terser()
-    ]
-}
+    plugins
+};
+
+let configs = inputs.map(input => {
+    return Object.assign({input}, config);
+});
+
+export default configs;
