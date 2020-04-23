@@ -1,0 +1,1 @@
+import e from"../../../node_modules/vue/dist/vue.runtime.esm.js";import m from"../../../node_modules/vue-custom-element/dist/vue-custom-element.js";import o from"./SignUpForm.vue.js";e.use(m),e.customElement("sign-up-form",o);

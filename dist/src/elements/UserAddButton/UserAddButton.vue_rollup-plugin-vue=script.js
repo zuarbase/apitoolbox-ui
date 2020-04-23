@@ -1,0 +1,1 @@
+import o from"../UserEditModal/UserEditModal.vue.js";var e={name:"UserAddButton",props:{server:String,buttonText:String},data:()=>({user:{},openModal:!1}),methods:{onAddUserClick(){this.openModal=!0},onModalClose(){console.debug("modal close callback"),this.openModal=!1}},components:{UserEditModal:o}};export default e;
