@@ -26,7 +26,7 @@ Just what you need:
 `require('apitoolbox-ui/sign-up-form');`
 
 Or everything:
-`require('apitoolbox-ui);`
+`require('apitoolbox-ui');`
 
 ## Usage
 #### Add the elements to your page
