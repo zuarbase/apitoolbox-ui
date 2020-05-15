@@ -163,7 +163,7 @@
                 // .then(response => {
                 //     if (response.ok) {
                 //         // Success
-                //         let event = new Event('user-created.ft', {user: response.detal})
+                //         let event = new Event('user-created.ft', {user: response.detail})
                 //         document.dispatchEvent(event)
                 //         this.close()
                 //     } else {
@@ -262,6 +262,7 @@
 	    }
 	    .modal {
 	        width: 600px;
+            height: auto;
 	        position: absolute;
 	        top: 20%;
 	        left: 50%;

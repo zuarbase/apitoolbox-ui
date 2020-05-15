@@ -16,6 +16,8 @@ const inputs = [
     'src/elements/SignUpForm/sign-up-form.js',
     'src/elements/UserAddButton/user-add-button.js',
     'src/elements/UserList/user-list.js',
+    'src/elements/SubscribeModal/subscribe-modal.js',
+    'src/elements/SubscriptionList/subscription-list.js'
 ];
 
 const plugins = [
@@ -41,7 +43,7 @@ const plugins = [
     }),
     // uglify(),
     // gzip()
-    terser()
+    // terser()
 ];
 
 const config = {
