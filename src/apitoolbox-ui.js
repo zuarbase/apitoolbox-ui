@@ -18,3 +18,8 @@ Vue.customElement('subscription-list', SubscriptionList);
 Vue.customElement('user-add-button', UserAddButton);
 Vue.customElement('user-edit-modal', UserEditModal);
 Vue.customElement('user-list', UserList);
+
+export {
+	LoginForm,
+	SignUpForm
+}

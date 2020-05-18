@@ -43,7 +43,7 @@ Include the element in your page where you want it displayed, passing in configu
 Bootstrap classes (but not style rules) are included on most elements to aid in styling. Minimal styling is included out of the box.
 
 ## Examples
-See more example usages in [/dist/examples.html](dist/examples.html)
+See more example usages in [examples.html](/examples.html)
 
 - or -
 

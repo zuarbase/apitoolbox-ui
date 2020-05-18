@@ -5,7 +5,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 module.exports = {
     mode: 'development',
     entry: {
-        index: './src/frontend-toolbox.js'
+        index: './src/apitoolbox-ui.js'
     },
     devServer: {
         contentBase: path.join(__dirname, 'dist'),

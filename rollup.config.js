@@ -11,7 +11,7 @@ import vue from 'rollup-plugin-vue'
 // import postcss from 'rollup-plugin-postcss';
 
 const inputs = [
-    'src/frontend-toolbox.js',
+    'src/apitoolbox-ui.js',
     'src/elements/LoginForm/login-form.js',
     'src/elements/SignUpForm/sign-up-form.js',
     'src/elements/UserAddButton/user-add-button.js',
