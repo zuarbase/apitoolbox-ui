@@ -15,10 +15,10 @@
         },
         data: () => {
             return {
-                user: {
+                user: JSON.stringify({
                     groups: [],
                     permissions: []
-                },
+                }),
                 openModal: false
             }
         },

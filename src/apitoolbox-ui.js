@@ -9,6 +9,7 @@ import SubscriptionList from './elements/SubscriptionList/SubscriptionList.vue';
 import UserAddButton from './elements/UserAddButton/UserAddButton.vue';
 import UserEditModal from './elements/UserEditModal/UserEditModal.vue';
 import UserList from './elements/UserList/UserList.vue';
+import UserPasswordChangeModal from './elements/UserPasswordChangeModal/UserPasswordChangeModal.vue';
 
 Vue.use(VueCustomElement);
 Vue.customElement('login-form', LoginForm);
@@ -18,6 +19,7 @@ Vue.customElement('subscription-list', SubscriptionList);
 Vue.customElement('user-add-button', UserAddButton);
 Vue.customElement('user-edit-modal', UserEditModal);
 Vue.customElement('user-list', UserList);
+Vue.customElement('user-password-change-modal', UserPasswordChangeModal);
 
 export {
 	LoginForm,

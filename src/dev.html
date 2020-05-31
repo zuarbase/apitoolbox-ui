@@ -160,6 +160,7 @@
                 <li><a href="#login-form">Login Form</a></li>
                 <li><a href="#user-add-button">User Add Button</a></li>
                 <li><a href="#user-list">User List</a></li>
+                <li><a href="#user-password-change-modal">User Password Change</a></li>
                 <li><a href="#subscribe-modal">Subscribe Modal</a></li>
                 <li><a href="#subscription-list">Subscription List</a></li>
             </ul>
@@ -245,6 +246,22 @@
                 <subscription-list
                     server="https://progea2.zuar.com">
                 </subscription-list>
+            </div>
+        </div>
+
+        <div class="page" id="user-password-change-modal">
+            <h2 class="widget-name">User Password Change Modal</h2>
+            <div class="user-add-button__widget-wrapper">
+                <user-password-change-modal
+                    user-id="'100'"
+                    open-modal="false">
+                </user-password-change-modal>
+
+                <button class="subscribe-button" 
+                    title="Subscribe" 
+                    onclick="document.querySelector('user-password-change-modal').setAttribute('open-modal', false); setTimeout(() => {document.querySelector('user-password-change-modal').setAttribute('open-modal', true)})">
+                    Change password
+                </button>
             </div>
         </div>
 

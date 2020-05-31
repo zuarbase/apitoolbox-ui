@@ -26,9 +26,9 @@
           </tbody>
         </table>
         <user-edit-modal 
+            :server="'https://dev.zuar.com'"
             :user-to-edit="userToEdit" 
-            :open-modal="openModal" 
-            :on-close="onModalClose">
+            :open-modal="openModal">
         </user-edit-modal>
     </div>
 </template>
@@ -44,7 +44,7 @@
             return {
                 users: [],
                 openModal: false,
-                userToEdit: {}
+                userToEdit: '{}'
             }
         },
         created () {
@@ -83,12 +83,12 @@
         },
         methods: {
             onEditClick (user) {
-                console.debug('edit click', user)
-                this.userToEdit = user
-                this.openModal = true
+                console.debug('edit click', user);
+                this.userToEdit = JSON.stringify(user);
+                this.openModal = true;
             },
             onModalClose () {
-                this.openModal = false
+                this.openModal = false;
             }
         },
         components: {UserEditModal}

@@ -1,4 +1,5 @@
 import alias from '@rollup/plugin-alias';
+import buble from '@rollup/plugin-buble';
 import commonjs from '@rollup/plugin-commonjs';
 import replace from '@rollup/plugin-replace';
 import resolve from '@rollup/plugin-node-resolve';
@@ -15,9 +16,11 @@ const inputs = [
     'src/elements/LoginForm/login-form.js',
     'src/elements/SignUpForm/sign-up-form.js',
     'src/elements/UserAddButton/user-add-button.js',
+    'src/elements/UserEditModal/user-edit-modal.js',
     'src/elements/UserList/user-list.js',
     'src/elements/SubscribeModal/subscribe-modal.js',
-    'src/elements/SubscriptionList/subscription-list.js'
+    'src/elements/SubscriptionList/subscription-list.js',
+    'src/elements/UserPasswordChangeModal/user-password-change-modal.js'
 ];
 
 const plugins = [
@@ -41,6 +44,7 @@ const plugins = [
     vue({
         compileTemplate: true
     }),
+    buble({exclude: ['node_modules']})
     // uglify(),
     // gzip()
     // terser()
