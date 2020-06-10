@@ -278,17 +278,17 @@
             },
             onSaveClick () {
                 this.disabled = true;
-                
+                let time = this.getSendTime();
                 let subscription = {
                     email: this.email,
                     view_name: this.formState.dashboard.id != 0 ? this.getViewName(this.formState.dashboard.url) : this.getViewName(this.currentDashboard.url),
                     schedule: this.formState.frequency, // daily, weekly, monthly
                     day_of: this.formState.frequency === 'DAILY' ? 0 : this.formState.frequency === 'WEEKLY' ? this.formState.dayOfWeek : this.formState.dayOfMonth,
-                    send_at: `${this.formState.hour}:${this.formState.minute} ${this.formState.ampm}`, // "8:00 am"
+                    send_at: time, // "8:00 - 24-h format"
                     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
                     full: this.formState.dashboard.id === 0
                 };
-
+                console.log(subscription);
                 fetch(`${this.server}/auth/subscriptions`, {
                     method: 'POST',
                     headers: {
@@ -327,6 +327,10 @@
             },
             getViewName (url) {
                 return url.split('/views/').pop().split('?')[0];
+            },
+            getSendTime () {
+                let hours = this.formState.ampm === 'pm' ? (this.formState.hour + 12) % 24 : this.formState.hour;
+                return `${hours}:${this.formState.minute}`
             },
             handleResponse (response) {
                 return response.json()
