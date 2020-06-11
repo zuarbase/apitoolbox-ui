@@ -156,6 +156,7 @@
             openModal: Boolean, // Requested modal state
             email: String, // Subscription Email
             selectedDashboardId: String,
+            filters: String,
             translations: String,
             locale: String
         },
@@ -220,6 +221,13 @@
                 if (this.translations && this.locale) {
                     this.$translate.setLocales(JSON.parse(this.translations));
                     this.$translate.setLang(this.locale);
+                }
+            },
+            filters: function(val){
+                try {
+                    this.filtersArray = JSON.parse(val);
+                } catch (error) {
+                    this.filtersArray = false;
                 }
             }
         },
@@ -286,9 +294,11 @@
                     day_of: this.formState.frequency === 'DAILY' ? 0 : this.formState.frequency === 'WEEKLY' ? this.formState.dayOfWeek : this.formState.dayOfMonth,
                     send_at: time, // "8:00 - 24-h format"
                     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    full: this.formState.dashboard.id === 0
+                    full: this.formState.dashboard.id === 0,
+                    json_data:{
+                        ...this.filtersArray
+                    }
                 };
-                console.log(subscription);
                 fetch(`${this.server}/auth/subscriptions`, {
                     method: 'POST',
                     headers: {
