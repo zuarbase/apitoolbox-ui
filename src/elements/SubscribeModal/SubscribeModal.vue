@@ -23,7 +23,7 @@
                                                 v-model="formState.dashboard"
                                                 :required="true"
                                                 :disabled="disabled">
-                                                <option v-for="dashboard in dashboards" v-bind:value="dashboard">
+                                                <option v-for="dashboard in dashboards" v-bind:value="dashboard" v-bind:key="dashboard.id">
                                                     {{ t(dashboard.name) }}
                                                 </option>
                                             </select>
@@ -40,7 +40,7 @@
                                                         v-model="formState.frequency"
                                                         :required="true"
                                                         :disabled="disabled">
-                                                        <option v-for="frequency in frequencies" v-bind:value="frequency">
+                                                        <option v-for="frequency in frequencies" v-bind:value="frequency" v-bind:key="frequency">
                                                             {{ t(frequency) }}
                                                         </option>
                                                     </select>
@@ -55,7 +55,7 @@
                                                         v-model="formState.dayOfWeek"
                                                         :required="true"
                                                         :disabled="disabled">
-                                                        <option v-for="dayOfWeek in frequencySettingsWeekly" v-bind:value="dayOfWeek.value">
+                                                        <option v-for="dayOfWeek in frequencySettingsWeekly" v-bind:value="dayOfWeek.value" v-bind:key="dayOfWeek.value">
                                                             {{ t(dayOfWeek.label) }}
                                                         </option>
                                                     </select>
@@ -70,7 +70,7 @@
                                                         v-model="formState.dayOfMonth"
                                                         :required="true"
                                                         :disabled="disabled">
-                                                        <option v-for="(day, index) in frequencySettingsMonthly" v-bind:value="index+1">
+                                                        <option v-for="(day, index) in frequencySettingsMonthly" v-bind:value="index+1" v-bind:key="day">
                                                             {{ index+1 }}
                                                         </option>
                                                     </select>
@@ -89,7 +89,7 @@
                                                     v-model="formState.hour"
                                                     :required="true"
                                                     :disabled="disabled">
-                                                    <option v-for="(hour, index) in hours" v-bind:value="index+1">
+                                                    <option v-for="(hour, index) in hours" v-bind:value="index+1" v-bind:key="hour">
                                                         {{ index+1 }}
                                                     </option>
                                                 </select>
@@ -101,7 +101,7 @@
                                                     v-model="formState.minute"
                                                     :required="true"
                                                     :disabled="disabled">
-                                                    <option v-for="minute in minutes" v-bind:value="minute">
+                                                    <option v-for="minute in minutes" v-bind:value="minute"  v-bind:key="minute">
                                                         {{ minute }}
                                                     </option>
                                                 </select>
@@ -113,7 +113,7 @@
                                                     v-model="formState.ampm"
                                                     :required="true"
                                                     :disabled="disabled">
-                                                    <option v-for="ampm in ['am', 'pm']" v-bind:value="ampm">
+                                                    <option v-for="ampm in ['am', 'pm']" v-bind:value="ampm" v-bind:key="ampm">
                                                         {{ ampm }}
                                                     </option>
                                                 </select>
@@ -156,6 +156,7 @@
             openModal: Boolean, // Requested modal state
             email: String, // Subscription Email
             selectedDashboardId: String,
+            filters: String,
             translations: String,
             locale: String
         },
@@ -221,6 +222,13 @@
                     this.$translate.setLocales(JSON.parse(this.translations));
                     this.$translate.setLang(this.locale);
                 }
+            },
+            filters: function(val){
+                try {
+                    this.filtersObject = JSON.parse(val);
+                } catch (error) {
+                    this.filtersObject = false;
+                }
             }
         },
         mounted () {
@@ -278,17 +286,18 @@
             },
             onSaveClick () {
                 this.disabled = true;
-                
                 let subscription = {
                     email: this.email,
                     view_name: this.formState.dashboard.id != 0 ? this.getViewName(this.formState.dashboard.url) : this.getViewName(this.currentDashboard.url),
                     schedule: this.formState.frequency, // daily, weekly, monthly
                     day_of: this.formState.frequency === 'DAILY' ? 0 : this.formState.frequency === 'WEEKLY' ? this.formState.dayOfWeek : this.formState.dayOfMonth,
-                    send_at: `${this.formState.hour}:${this.formState.minute} ${this.formState.ampm}`, // "8:00 am"
+                    send_at: this.getSendTime(), // "16:00 - 24-h format"
                     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    full: this.formState.dashboard.id === 0
+                    full: this.formState.dashboard.id === 0,
+                    json_data:{
+                        ...this.filtersObject
+                    }
                 };
-
                 fetch(`${this.server}/auth/subscriptions`, {
                     method: 'POST',
                     headers: {
@@ -327,6 +336,10 @@
             },
             getViewName (url) {
                 return url.split('/views/').pop().split('?')[0];
+            },
+            getSendTime () {
+                let hours = this.formState.ampm === 'pm' ? (this.formState.hour + 12) % 24 : this.formState.hour;
+                return `${hours}:${this.formState.minute}`
             },
             handleResponse (response) {
                 return response.json()
