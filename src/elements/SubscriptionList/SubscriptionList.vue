@@ -1,12 +1,12 @@
 <template>
     <div class="subscription-list__wrapper">
-        <table class="table table-striped">
+        <table class="table table-striped table-responsive-lg">
             <thead>
                 <tr>
                     <th>{{ t('EMAIL') }}</th>
                     <th>{{ t('DASHBOARD') }}</th>
                     <th>{{ t('ALL') }}</th>
-                    <th>{{ t('FREQUENCY_SETTING') }}</th>
+                    <th>{{ t('FREQUENCY') }}</th>
                     <th>{{ t('SEND_TIME') }}</th>
                     <th></th>
                 </tr>
