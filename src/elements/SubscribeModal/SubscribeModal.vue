@@ -225,9 +225,9 @@
             },
             filters: function(val){
                 try {
-                    this.filtersArray = JSON.parse(val);
+                    this.filtersObject = JSON.parse(val);
                 } catch (error) {
-                    this.filtersArray = false;
+                    this.filtersObject = false;
                 }
             }
         },
@@ -295,7 +295,7 @@
                     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
                     full: this.formState.dashboard.id === 0,
                     json_data:{
-                        ...this.filtersArray
+                        ...this.filtersObject
                     }
                 };
                 fetch(`${this.server}/auth/subscriptions`, {
