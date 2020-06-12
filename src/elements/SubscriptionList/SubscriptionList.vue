@@ -1,12 +1,12 @@
 <template>
     <div class="subscription-list__wrapper">
-        <table class="table p-table-striped">
+        <table class="table table-striped table-responsive-lg">
             <thead>
                 <tr>
                     <th>{{ t('EMAIL') }}</th>
                     <th>{{ t('DASHBOARD') }}</th>
                     <th>{{ t('ALL') }}</th>
-                    <th>{{ t('FREQUENCY_SETTING') }}</th>
+                    <th>{{ t('FREQUENCY') }}</th>
                     <th>{{ t('SEND_TIME') }}</th>
                     <th></th>
                 </tr>
@@ -24,7 +24,7 @@
                         <button v-on:click="onDeleteClick(subscription)" class="btn btn-secondary btn-small">Delete</button>
                     </td>
                 </tr>
-                <tr class="subscription-details" :key="'filters'+subscription.id" v-show="openedSubscription === subscription.id">
+                <div :key="'filters'+subscription.id" v-show="openedSubscription === subscription.id" style="display:table-row;">
                     <td colspan="6">
                         <ul v-if="isSubscriptionHasFilters(subscription)">
                             <li v-for="(value, filter) in subscription.json_data" :key="filter">
@@ -33,7 +33,7 @@
                         </ul>
                         <span v-if="!isSubscriptionHasFilters(subscription)">No filters founded</span>
                     </td>
-                </tr>
+                </div>
                 </template>
           </tbody>
         </table>
@@ -172,23 +172,6 @@
             max-width: 100%;
             border-collapse: collapse;
             text-align: left;
-        }
-
-        .table.p-table-striped{
-            tbody{
-                tr:nth-child(4n+1),
-                tr:nth-child(4n+2){
-                    background-color: white;
-                    
-                }
-                tr:nth-child(4n+3),
-                tr:nth-child(4n){
-                    background-color: rgba(0, 0, 0, 0.05);
-                }
-                tr:not(.subscription-details){
-                    cursor: pointer;
-                }
-            }
         }
 
         .table thead th {
