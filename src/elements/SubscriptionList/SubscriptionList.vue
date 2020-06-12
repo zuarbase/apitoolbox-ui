@@ -87,7 +87,6 @@
                     .then(this.handleResponse)
                     .then(json => {
                         this.subscriptions.push(...json);
-                        console.log(this.subscriptions)
                     });
             },
             // onEditClick (subscription) {
