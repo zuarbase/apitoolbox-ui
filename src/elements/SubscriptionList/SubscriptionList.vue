@@ -1,18 +1,19 @@
 <template>
     <div class="subscription-list__wrapper">
-        <table class="table table-striped table-responsive-lg">
+        <table class="table p-table-striped">
             <thead>
                 <tr>
                     <th>{{ t('EMAIL') }}</th>
                     <th>{{ t('DASHBOARD') }}</th>
                     <th>{{ t('ALL') }}</th>
-                    <th>{{ t('FREQUENCY') }}</th>
+                    <th>{{ t('FREQUENCY_SETTING') }}</th>
                     <th>{{ t('SEND_TIME') }}</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="subscription in subscriptions">
+                <template v-for="subscription in subscriptions">
+                <tr :key="'info'+subscription.id" v-on:click="toggle(subscription)">
                     <td>{{subscription.email}}</td>
                     <td>{{subscription.view_name}}</td>
                     <td class="uppercase">{{ t(subscription.full) }}</td>
@@ -23,6 +24,17 @@
                         <button v-on:click="onDeleteClick(subscription)" class="btn btn-secondary btn-small">Delete</button>
                     </td>
                 </tr>
+                <tr class="subscription-details" :key="'filters'+subscription.id" v-show="openedSubscription === subscription.id">
+                    <td colspan="6">
+                        <ul v-if="isSubscriptionHasFilters(subscription)">
+                            <li v-for="(value, filter) in subscription.json_data" :key="filter">
+                                {{filter}}: {{value}}
+                            </li>
+                        </ul>
+                        <span v-if="!isSubscriptionHasFilters(subscription)">No filters founded</span>
+                    </td>
+                </tr>
+                </template>
           </tbody>
         </table>
     </div>
@@ -42,6 +54,7 @@
         data: () => {
             return {
                 subscriptions: [],
+                openedSubscription:'',
                 openModal: false,
                 userToEdit: {}
             }
@@ -59,6 +72,13 @@
             })
         },
         methods: {
+            toggle(subscription){
+                if(this.openedSubscription === subscription.id) {
+                    this.openedSubscription = ''
+                } else {
+                    this.openedSubscription = subscription.id;
+                }
+            },
             fetchSubscriptions () {
                 if (!this.server) {
                     return;
@@ -67,6 +87,7 @@
                     .then(this.handleResponse)
                     .then(json => {
                         this.subscriptions.push(...json);
+                        console.log(this.subscriptions)
                     });
             },
             // onEditClick (subscription) {
@@ -105,6 +126,9 @@
             },
             onModalClose () {
                 this.openModal = false
+            },
+            isSubscriptionHasFilters(sub){
+                return Object.keys(sub.json_data).length !== 0;
             }
         },
         watch: {
@@ -130,7 +154,6 @@
 </script>
 
 <style lang="scss">
-    
     .subscription-list__wrapper {
         font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
         -webkit-font-smoothing: antialiased;
@@ -150,6 +173,24 @@
             border-collapse: collapse;
             text-align: left;
         }
+
+        .table.p-table-striped{
+            tbody{
+                tr:nth-child(4n+1),
+                tr:nth-child(4n+2){
+                    background-color: white;
+                    
+                }
+                tr:nth-child(4n+3),
+                tr:nth-child(4n){
+                    background-color: rgba(0, 0, 0, 0.05);
+                }
+                tr:not(.subscription-details){
+                    cursor: pointer;
+                }
+            }
+        }
+
         .table thead th {
             vertical-align: bottom;
             border-bottom: 2px solid #dee2e6;
