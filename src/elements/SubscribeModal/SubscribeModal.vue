@@ -307,7 +307,7 @@
                 })
                 .then(this.handleResponse)
                 .then(json => {
-                    let event = new Event('subscription-created.ft', {subscription: json.detail});
+                    let event = new CustomEvent('subscription-created.ft', {detail:{subscription: json}});
                     document.dispatchEvent(event);
                     this.success = true;
                     setTimeout(() => {
