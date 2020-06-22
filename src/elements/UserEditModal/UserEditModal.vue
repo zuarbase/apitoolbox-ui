@@ -2,7 +2,7 @@
 	<div v-show="false" ref="modalTemplate">
         <div class="modal__wrapper" ref="modalWrapper">
             <div class="modal-backdrop">
-                <div class="modal">
+                <div class="modal" v-bind:class="{ show: isOpen,'d-block': isOpen}">
                     <header class="header">
                     	<h1 v-if="!userToEdit.id">Add User</h1>
                     	<h1 v-if="userToEdit.id">Edit User</h1>
@@ -295,7 +295,8 @@
 	        background: #fa225b;
 	    }
 	    .btn-link {
-	        color: #fa225b;
+			color: #fa225b;
+			background-color: white;
 	    }
 	    .btn-block {
 	        display: block;
