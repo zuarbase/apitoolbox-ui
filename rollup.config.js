@@ -15,6 +15,7 @@ const inputs = [
     'src/elements/LoginForm/login-form.js',
     'src/elements/SignUpForm/sign-up-form.js',
     'src/elements/UserAddButton/user-add-button.js',
+    'src/elements/UserEditModal/user-edit-modal.js',
     'src/elements/UserList/user-list.js',
     'src/elements/SubscribeModal/subscribe-modal.js',
     'src/elements/SubscriptionList/subscription-list.js'

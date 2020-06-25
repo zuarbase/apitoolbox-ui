@@ -74,7 +74,7 @@
         methods: {
             toggle(subscription){
                 if(this.openedSubscription === subscription.id) {
-                    this.openedSubscription = ''
+                    this.openedSubscription = '';
                 } else {
                     this.openedSubscription = subscription.id;
                 }

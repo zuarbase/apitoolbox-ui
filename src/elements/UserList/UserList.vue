@@ -1,23 +1,27 @@
 <template>
     <div class="user-list__wrapper">
-        <table class="table">
+        <table class="table table-striped table-responsive-lg">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Email</th>
+                    <th>Username</th>
                     <th>Name</th>
+                    <th>Email</th>
                     <th>Groups</th>
                     <th>Permissions</th>
+                    <th>Admin</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="user in users">
                     <th>{{user.id}}</th>
+                    <td>{{user.username}}</td>
+                    <td>{{user.fullname}}</td>
                     <td>{{user.email}}</td>
-                    <td>{{user.name}}</td>
-                    <td>{{user.groups.join(', ')}}</td>
-                    <td class="permissions">{{user.permissions.join(', ')}}</td>
+                    <td>{{user.groups ? user.groups.join(', ') : '--'}}</td>
+                    <td class="permissions">{{user.permissions ? user.permissions.join(', ') : '--'}}</td>
+                    <td><input type="checkbox" :checked="user.admin" disabled></td>
                     <td>
                         <button class="btn btn-secondary btn-small" v-on:click="onEditClick(user)">Edit</button>
                         <button class="btn btn-secondary btn-small">Delete</button>
@@ -26,7 +30,7 @@
           </tbody>
         </table>
         <user-edit-modal 
-            :user-to-edit="userToEdit" 
+            :user-id="userToEdit.id" 
             :open-modal="openModal" 
             :on-close="onModalClose">
         </user-edit-modal>
@@ -45,50 +49,52 @@
                 users: [],
                 openModal: false,
                 userToEdit: {}
-            }
+            };
         },
         created () {
-            setTimeout(() => {
-                this.users = [
-                    {
-                        id: 1,
-                        name: 'Matt Laue',
-                        email: 'matt@zuar.com',
-                        groups: ['Administrator'],
-                        permissions: ['Read', 'Write', 'Edit', 'Delete']
-                    },
-                    {
-                        id: 2,
-                        name: 'Dylan Spurgin',
-                        email: 'dylan@dylanspurgin.com',
-                        groups: ['Editor'],
-                        permissions: ['Read', 'Write', 'Edit']
-                    }
-                ]
-            }, 300)
-            // fetch(`${this.server}/api/users`)
-            //     .then(response => {
-            //         console.debug('users', response)
-            //     })
+            this.users.length = 0;
+            fetch(`${this.server}/auth/users`)
+                .then(this.handleResponse)
+                .then(json => {
+                    this.users.push(...json);
+                    console.debug('users', this.users);
+                });
 
             document.addEventListener('user-created.ft', (e, p) => {
-                console.debug('user-created.ft', e)
-                this.users.push(e.detail.user)
-            })
+                console.debug('user-created.ft', e);
+                this.users.push(e.detail.user);
+            });
 
             document.addEventListener('user-edited.ft', (e, p) => {
-                console.debug('user-edited.ft', e)
-                Object.assign(this.users.find(user => user.id === e.detail.user.id), e.detail.user)
-            })
+                console.debug('user-edited.ft', e);
+                Object.assign(this.users.find(user => user.id === e.detail.user.id), e.detail.user);
+            });
         },
         methods: {
+            handleResponse (response) {
+                return response.json()
+                    .then((json) => {
+                        if (!response.ok) {
+                            const error = Object.assign({}, json, {
+                                status: response.status,
+                                statusText: response.statusText,
+                            });
+
+                            return Promise.reject(error);
+                        }
+                        return json;
+                    });
+            },
             onEditClick (user) {
-                console.debug('edit click', user)
-                this.userToEdit = user
-                this.openModal = true
+                console.debug('edit click', user);
+                this.userToEdit = user;
+                this.openModal = false;
+                window.setTimeout(() => {
+                    this.openModal = true;
+                });
             },
             onModalClose () {
-                this.openModal = false
+                this.openModal = false;
             }
         },
         components: {UserEditModal}
