@@ -8,7 +8,7 @@
                     <th>Name</th>
                     <th>Groups</th>
                     <th>Permissions</th>
-                    <th>Actions</th>
+                    <th width="1">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -124,6 +124,9 @@
             padding: .75rem;
             vertical-align: top;
             border-top: 1px solid #dee2e6;
+        }
+        .table td:last-of-type{
+            white-space: nowrap;
         }
         .permissions {
             font-size: .8rem;

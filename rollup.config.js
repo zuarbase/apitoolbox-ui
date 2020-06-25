@@ -17,7 +17,10 @@ const inputs = [
     'src/elements/UserAddButton/user-add-button.js',
     'src/elements/UserList/user-list.js',
     'src/elements/SubscribeModal/subscribe-modal.js',
-    'src/elements/SubscriptionList/subscription-list.js'
+    'src/elements/SubscriptionList/subscription-list.js',
+    'src/elements/UserEditModal/user-edit-modal.js',
+    'src/elements/PermissionEditModal/permission-edit-modal.js',
+    'src/elements/PermissionList/permission-list.js'
 ];
 
 const plugins = [
