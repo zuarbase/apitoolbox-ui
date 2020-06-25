@@ -24,7 +24,10 @@
         },
         methods: {
             onAddUserClick () {
-                this.openModal = true
+                this.openModal = false;
+                window.setTimeout(() => {
+                    this.openModal = true;
+                });
             },
             onModalClose () {
                 console.debug('modal close callback')

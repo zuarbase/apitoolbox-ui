@@ -1,86 +1,142 @@
 <template>
 	<div v-show="false" ref="modalTemplate">
-        <div class="modal__wrapper" ref="modalWrapper">
-            <div class="modal-backdrop">
-                <div class="modal" v-bind:class="{ show: isOpen,'d-block': isOpen}">
-                    <header class="header">
-                    	<h1 v-if="!userToEdit.id">Add User</h1>
-                    	<h1 v-if="userToEdit.id">Edit User</h1>
-                	</header>
-                    <main class="main">
-                        <form
-                            class="form"
-                            novalidate>
-                            <div class="form-group">
-                                <input 
-                                    type="text" 
-                                    class="form-control" 
-                                    name="name" 
-                                    placeholder="Name"
-                                    ref="name"
-                                    v-model="user.name"
-                                    :required="true" />
-                            </div>
-                            <div class="form-group">
-                                <input 
-                                    type="text" 
-                                    class="form-control" 
-                                    name="email" 
-                                    placeholder="Email"
-                                    ref="email"
-                                    v-model="user.email"
-                                    :required="true" />
-                            </div>
+        <div class="modal-window user-edit-modal" ref="modalWrapper">
+            <div class="modal fade" ref="modal">
+                <div class="modal-dialog modal-md modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <header class="modal-header">
+                            <h3 v-if="!userId">Add User</h3>
+                            <h3 v-if="userId">Edit User</h3>
+                        </header>
+                        <main class="modal-body">
+                             <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col">
+                                        <form
+                                            class="form needs-validation"
+                                            novalidate
+                                            ref="form">
+                                            <div class="form-group">
+                                                <label for="username">Username</label>
+                                                <input 
+                                                    type="text" 
+                                                    class="form-control" 
+                                                    id="username" 
+                                                    name="username" 
+                                                    placeholder="Username"
+                                                    ref="username"
+                                                    v-model="user.username"
+                                                    :disabled="userId"
+                                                    required/>
+                                                    <div class="invalid-feedback">Please provide a username</div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="name">Full Name</label>
+                                                <input 
+                                                    type="text" 
+                                                    class="form-control" 
+                                                    id="name" 
+                                                    name="name" 
+                                                    placeholder="Name"
+                                                    ref="name"
+                                                    v-model="user.fullname"
+                                                    required />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="email">Email</label>
+                                                <input 
+                                                    type="email" 
+                                                    class="form-control" 
+                                                    id="email" 
+                                                    name="email" 
+                                                    placeholder="Email"
+                                                    ref="email"
+                                                    autocomplete="new-email" 
+                                                    v-model="user.email"
+                                                    required />
+                                                    <div class="invalid-feedback">Please provide a valid email address</div>
+                                            </div>
 
-                            <div class="form-group">
-				                <input 
-				                    type="password" 
-				                    class="form-control"
-				                    name="password" 
-				                    placeholder="Password" 
-				                    ref="password"
-				                    v-model="password"
-				                    required="true">
-				                <input 
-				                    type="password" 
-				                    class="form-control password-confirm"
-				                    name="passwordConfirm" 
-				                    placeholder="Confirm Password" 
-				                    ref="passwordConfirm"
-				                    v-model="passwordConfirm"
-				                    required="true">
-			                    <label class="error-message" v-if="passwordMatchError">Passwords do not match.</label>
-			                    <label class="error-message" v-if="passwordLengthError">Password must be at least 6 characters in length.</label>
-				            </div>
+                                            <div class="form-group">
+                                                <label for="username"> 
+                                                    <span v-if="userId">Reset Password (optional)</span>
+                                                    <span v-if="!userId">Password</span>
+                                                </label>
+                				                <input 
+                				                    type="password" 
+                				                    class="form-control"
+                				                    id="password" 
+                                                    name="password" 
+                				                    placeholder="Password"
+                                                    autocomplete="new-password" 
+                				                    ref="password"
+                				                    v-model="password"
+                                                    minlength="6"
+                				                    :required="!userId">
+                                                    <div class="invalid-feedback">Password must be at least 6 characters in length</div>
+                				                <input 
+                				                    type="password" 
+                				                    class="form-control password-confirm"
+                				                    id="passwordConfirm" 
+                                                    name="passwordConfirm" 
+                				                    placeholder="Confirm Password" 
+                				                    ref="passwordConfirm"
+                				                    v-model="passwordConfirm"
+                				                    :required="!userId">
+                			                    <div class="invalid-feedback">Passwords must match</div>
+                				            </div>
 
-				            <div class="form-group-row" v-if="isOpen">
-					            <div class="form-group">
-	                                <multiselect 
-	                                	v-model="selectedGroups"
-	                                	:options="groups"
-	                                	tag-placeholder="Add as new group" 
-	                                	placeholder="Groups" 
-	                                	:multiple="true" 
-	                                	:taggable="true" 
-	                                	@tag="addGroup"></multiselect>
-	                            </div>
-					            <div class="form-group">
-	                                <multiselect 
-	                                	v-model="selectedPermissions" 
-	                                	:options="permissions"
-	                                	tag-placeholder="Add as new permission"
-	                                	placeholder="Permissions" 
-	                                	:multiple="true" 
-	                                	:taggable="true" 
-	                                	@tag="addPermission"></multiselect>
-	                            </div>
+                				            <div class="form-group-row" v-if="isOpen">
+                					            <div class="form-group">
+                                                    <label for="groups">Groups</label>
+                	                                <multiselect 
+                	                                	v-model="selectedGroups"
+                	                                	:options="groups"
+                                                        id="groups"
+                	                                	tag-placeholder="Add as new group" 
+                	                                	placeholder="Groups" 
+                	                                	:multiple="true" 
+                	                                	:taggable="true" 
+                	                                	@tag="addGroup"></multiselect>
+                	                            </div>
+                					            <div class="form-group">
+                                                    <label for="permissions">Permissions</label>
+                	                                <multiselect 
+                	                                	v-model="selectedPermissions" 
+                	                                	:options="permissions"
+                                                        id="permissions"
+                	                                	tag-placeholder="Add as new permission"
+                	                                	placeholder="Permissions" 
+                	                                	:multiple="true" 
+                	                                	:taggable="true" 
+                	                                	@tag="addPermission"></multiselect>
+                	                            </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <div class="form-check form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input 
+                                                            type="checkbox"
+                                                            class="form-check-input"
+                                                            id="is_admin"
+                                                            v-model="user.admin"
+                                                            name="is_admin"
+                                                            required>
+                                                        Administrator
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
-                        </form>
-                    </main>
-                    <footer class="footer">
-                        <button v-on:click="onCancelClick" class="btn btn-link">Cancel</button>
-                        <button v-on:click="onSaveClick" class="btn btn-primary">Save</button>
-                    </footer>
+                        </main>
+                        <footer class="modal-footer">
+                            <button v-on:click="onCancelClick" class="btn btn-link">Cancel</button>
+                            <button v-on:click="onSaveClick" class="btn btn-primary">Save</button>
+                        </footer>
+                    </div>
                 </div>
             </div>
         </div>
@@ -92,20 +148,24 @@
     export default {
         name: 'UserEditModal',
         props: {
+            server: {
+                type: String,
+                default: ''
+            },
             openModal: Boolean, // Requested modal state
-            onClose: Function,
-            userToEdit: Object
+            userId: String
         },
         data: () => {
             return {
-                user: {},
+                user: {}, // form state
+                userToEdit: {}, // from API
                 password: '', // Password change model
                 passwordConfirm: '',
                 passwordMatchError: false,
                 passwordLengthError: false,
                 groups: ['Administrator', 'Editor', 'User'],
                 selectedGroups: [], // Groups tag component model
-                permissions: ['Read', 'Write', 'Edit', 'Delete'],
+                permissions: ['Read all users', 'Write all users', 'Edit all users', 'Delete all users'],
                 selectedPermissions: [], // Permissions tag component model
                 isOpen: false // Actual modal state
             }
@@ -114,19 +174,36 @@
             openModal: function (val) {
             	if (val === this.isOpen) {
             		// Already in requested state
-            		return
+            		return;
             	}
                 if (val) {
-                	this.selectedGroups.length = 0
-                	this.selectedPermissions.length = 0
-                	if (this.userToEdit.id) {
-                		let userCopy = Object.assign({}, this.userToEdit)
-		        		let {groups, permissions, ...user} = userCopy
-		        		Object.assign(this.user, user)
-		        		this.selectedGroups.push(...groups)
-		        		this.selectedPermissions.push(...permissions)
-		        		console.debug('Adding groups', this.selectedGroups)
-		        	}
+                    this.$refs.form.classList.remove('was-validated');
+                    this.server = this.server || '';
+
+                	this.selectedGroups.length = 0;
+                	this.selectedPermissions.length = 0;
+                    
+                    let groupsPromise = this.fetchGroups()
+                        .then(groups => {
+                            this.groups.length = 0;
+                            this.groups.push(...groups);
+                        });
+                    let permissionsPromise = this.fetchPermissions()
+                        .then(permissions => {
+                            this.permissions.length = 0;
+                            this.permissions.push(...permissions);
+                        });
+                    let userPromise = this.userId ? this.fetchUser() : Promise.resolve({});
+
+                	userPromise.then(user => {
+                        Object.assign(this.userToEdit, user);
+                        // let userCopy = Object.assign({}, this.userToEdit);
+                        let {groups, permissions} = user;
+                        Object.assign(this.user, user);
+                        this.selectedGroups.push(...groups || []);
+                        this.selectedPermissions.push(...permissions || []);
+                    });
+
                     this.open()
                 } else {
                     this.close()
@@ -140,58 +217,84 @@
             }
         },
         methods: {
+            fetchUser () {
+                return fetch(`${this.server}/auth/users/${this.userId}`)
+                    .then(this.handleResponse)
+                    .catch(e => {
+                        console.error('Error fetching user to edit', e);
+                    });
+            },
+            fetchGroups () {
+                return fetch(`${this.server}/auth/groups`)
+                    .then(this.handleResponse)
+                    .catch(e => {
+                        console.error('Error fetching user to edit', e);
+                    });
+            },
+            fetchPermissions () {
+                return fetch(`${this.server}/auth/permissions`)
+                    .then(this.handleResponse)
+                    .catch(e => {
+                        console.error('Error fetching user to edit', e);
+                    });
+            },
             onCancelClick () {
                 this.close()
             },
             onSaveClick () {
-            	console.debug('saving groups', this.selectedGroups)
-            	Object.assign(this.userToEdit, this.user)
-            	this.userToEdit.groups.length = 0
-            	this.userToEdit.permissions.length = 0
-            	this.userToEdit.groups.push(...this.selectedGroups)
-            	this.userToEdit.permissions.push(...this.selectedPermissions)
-                let requestBody = Object.assign({}, this.userToEdit)
-
-                // TODO - if (user.id) edit : save
-                // fetch(`${this.server}/user`, {
-                //     method: 'PUT',
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     },
-                //     body: requestBody
-                // })
-                // .then(response => {
-                //     if (response.ok) {
-                //         // Success
-                //         let event = new Event('user-created.ft', {user: response.detail})
-                //         document.dispatchEvent(event)
-                //         this.close()
-                //     } else {
-                //         response.json().then(json => {
-                //             json.detail.forEach(error => {
-                //                 error.loc.forEach(loc => {
-                //                     if (this.$refs[loc]) {
-                //                         this.$refs[loc].classList.add('error')
-                //                     }
-                //                 })
-                //             })
-                //         })
-                //     }
-                // })
-                // .catch(response => {
-                //     console.debug('Error creating user or parsing response', response)
-                // })
-
-                // Temp, dev code until API is ready
-                let event;
-                if (this.user.id) {
-                	event = new CustomEvent('user-edited.ft', {detail: {user: Object.assign({id:3}, this.userToEdit)}})
-                } else {
-                	event = new CustomEvent('user-created.ft', {detail: {user: Object.assign({id:3}, this.userToEdit)}})
+                if (this.$refs.form.checkValidity() === false) {
+                    console.debug("Form not valid");
+                    this.$refs.form.classList.add('was-validated');
+                    return;
                 }
+            	console.debug('saving groups', this.selectedGroups);
+            	Object.assign(this.userToEdit, this.user);
+            	this.userToEdit.groups = [];
+            	this.userToEdit.permissions = [];
+            	this.userToEdit.groups.push(...this.selectedGroups);
+            	this.userToEdit.permissions.push(...this.selectedPermissions);
+                let requestBody = Object.assign({}, this.userToEdit);
+
+                let url = this.userToEdit.id ? `${this.server}/auth/users/${this.userToEdit.id}` : `${this.server}/users`;
+                let method = this.userToEdit.id ? 'PUT' : 'POST';
+                fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Success
+                        let event;
+                        if (this.userToEdit.id) {
+                            event = new CustomEvent('user-edited.ft', {detail: {user: Object.assign({id:3}, this.userToEdit)}})
+                        } else {
+                            event = new CustomEvent('user-created.ft', {detail: {user: Object.assign({id:3}, this.userToEdit)}})
+                        }
+                        document.dispatchEvent(event);
+                        this.close()
+                    } else {
+                        response.json().then(json => {
+                            json.detail.forEach(error => {
+                                error.loc.forEach(loc => {
+                                    if (this.$refs[loc]) {
+                                        this.$refs[loc].classList.add('error')
+                                    }
+                                })
+                            })
+                        })
+                    }
+                })
+                .catch(response => {
+                    console.debug('Error creating user or parsing response', response)
+                })
+
                 document.dispatchEvent(event)
                 this.close()
             },
+
             addGroup (newGroup) {
       			this.user.groups.push(newGroup)
       			this.groups.push(newGroup)
@@ -200,36 +303,55 @@
       			this.user.permissions.push(newPermission)
       			this.permissions.push(newPermission)
 			},
-			checkPasswords () {
+			checkPasswords (required) {
 				this.$refs.password.classList.remove('error')
 				this.$refs.passwordConfirm.classList.remove('error')
 				this.passwordLengthError = false
 				this.passwordMatchError = false
 				if (this.password.length && this.passwordConfirm.length) {
+                    this.$refs.password.setCustomValidity('');
+                    this.$refs.passwordConfirm.setCustomValidity('');
 					if (this.password.length < 6) {
-						this.$refs.password.classList.add('error')
-						this.passwordLengthError = true
+						// this.$refs.password.classList.add('error')
+						// this.passwordLengthError = true
+                        this.$refs.password.setCustomValidity('Password must be at least 6 characters long.');
 					}
 					if (this.passwordConfirm.length < 6) {
-						this.$refs.passwordConfirm.classList.add('error')
+						this.$refs.passwordConfirm.setCustomValidity('Password must be at least 6 characters long.');
 					}
 					if (this.passwordConfirm !== this.password) {
-						this.$refs.passwordConfirm.classList.add('error')
-						this.passwordMatchError = true
+						this.$refs.passwordConfirm.setCustomValidity('Password must be at least 6 characters long.');
 					}
 				}
 			},
+            handleResponse (response) {
+                return response.json()
+                    .then((json) => {
+                        if (!response.ok) {
+                            const error = Object.assign({}, json, {
+                                status: response.status,
+                                statusText: response.statusText,
+                            });
+
+                            return Promise.reject(error);
+                        }
+                        return json;
+                    });
+            },
             open () {
-            	console.debug('Opening modal')
-                document.body.appendChild(this.$refs.modalWrapper)
-                this.isOpen = true
+                document.body.appendChild(this.$refs.modalWrapper);
+                window.setTimeout(() => {
+                    this.$refs.modal.classList.add('show');    
+                }, 100);
+                
+                this.isOpen = true;
             },
             close () {
-                this.$refs.modalTemplate.appendChild(this.$refs.modalWrapper)
-                this.isOpen = false
-                if (typeof this.onClose === 'function') {
-                	this.onClose()
-                }
+                this.$refs.modal.classList.remove('show');
+                window.setTimeout(() => {
+                    this.$refs.modalTemplate.appendChild(this.$refs.modalWrapper);
+                }, 300);
+                this.isOpen = false;
             }
         },
         components: {
@@ -240,125 +362,39 @@
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style lang="scss">
-    
-    .modal__wrapper {
+    .user-edit-modal {
         position: fixed;
         top: 0;
         left: 0;
-        bottom: 0;
-        right: 0;
+        width: 100%;
+        height: 100%;
         z-index: 999;
-
+        background-color: rgba(0, 0, 0, .4);
+        transition: all 0.3s;
         *, ::after, ::before {
-	        box-sizing: border-box;
-	    }
-	    
-	    .modal-backdrop {
-	        width: 100%;
-	        height: 100%;
-	        background-color: rgba(0, 0, 0, .4);
-	        pointer-events: none;
-	        transition: all 0.3s;
-	    }
-	    .modal {
-	        width: 600px;
+            box-sizing: border-box;
+        }
+        .modal {
+            display: block;
+        }
+        .modal-dialog {
+            max-width: 500px;
+            position: relative;
+            margin: 1.75rem auto;
+            transition: transform .3s ease-out;
+        }
+        .modal-content {
             height: auto;
-	        position: absolute;
-	        top: 20%;
-	        left: 50%;
-	        transform: translate(-50%, -20%);
-	        background: #ffffff;
-	        border-radius: 3px;
-	        pointer-events: all;
-	    }
-	    .header {
-	    	padding: 1rem;
-	    	border-bottom: solid 1px #e3e3e3;
-	    	h1 {
-	    		font-size: 1.4rem;
-	    	}
-	    }
-	    .main {
-	    	padding: 1rem;
-	    	background-color: #fffbfc;
-	    }
-	    .btn {
-	        border-radius: 2px;
-	        padding: .5rem 1rem;
-	        line-height: 1.5rem;
-	        font-size: 1rem;
-	        font-weight: bold;
-	        border: none;
-	        color: #fff;
-	    }
-	    .btn-primary {
-	        background: #fa225b;
-	    }
-	    .btn-link {
-			color: #fa225b;
-			background-color: white;
-	    }
-	    .btn-block {
-	        display: block;
-	        width: 100%;
-	    }
-	    .btn:hover {
-	        cursor: pointer;
-	        box-shadow: 0 0 10px 4px rgba(250, 34, 91, 0.1);
-	    }
-	    .btn:focus {
-	        outline: 0;
-	    }
-
-	   .form {
-	        font-size: 13px;
-	        position: relative;
-	    }
-	    .form-group {
-	        margin-bottom: 1rem;
-	    }
-	    .form-control {
-	        display: block;
-	        width: 100%;
-	        padding: .375rem .75rem;
-	        font-size: 1rem;
-	        line-height: 1.5;
-	        border-radius: 2px;
-	        min-height: 41px;
-	        background: #fff;
-	        border: 1px solid #e3e3e3;
-	        box-shadow: none !important;
-	    }
-	    .form-control:focus {
-	        outline: 0;
-	    }
-
-	    .password-confirm {
-	    	margin-top: -2px;
-	    	border-top-left-radius: 0px;
-	    	border-top-right-radius: 0px;
-	    }
-	    .form-control.error, .form-control.vf-invalid {
-            border-color: #d9534f;
-            background: #fff0f4;
-        }
-        .error-message {
-        	color: #d9534f;
-        	font-size: .8rem;
+            background: #ffffff;
+            pointer-events: all;
         }
 
-	    .multiselect__tags {
-	    	border-radius: 2px;
-	    }
-
-	    .footer {
-	        display: flex;
-	        justify-content: flex-end;
-	        border-top: solid 1px #e3e3e3;
-	        padding: 1rem;
-	        .btn {
-	            margin-left: 1rem;
-	        }
-	    }
+        .form-control:focus {
+            outline: 0;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
     }
 </style>
