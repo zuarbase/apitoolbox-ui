@@ -1,3 +1,5 @@
+import Vue from 'vue';
 Vue.filter('dateTimeFormat', function (value) {
-    return new Date(value).toLocaleDateString();
+	let date = new Date(value);
+    return `${date.toGMTString()}`;
 });

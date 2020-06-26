@@ -12,7 +12,9 @@
                 Permissions
             </div>
             <div class="col-10 d-flex justify-content-start">
-                {{permissions.map(p => p.name).join(', ')}}
+                <ul v-if="permissions" class="list-group">
+                    <li v-for="permission in permissions" class="list-group-item">{{permission.name}}</li>
+                </ul>
             </div>
         </div>
 
@@ -21,7 +23,7 @@
                 Created at
             </div>
             <div class="col-10 d-flex justify-content-start">
-                {{group.created_at}}
+                {{group.created_at | dateTimeFormat}}
             </div>
         </div>
 
@@ -30,7 +32,7 @@
                 Last updated at
             </div>
             <div class="col-10 d-flex justify-content-start">
-                {{group.updated_at}}
+                {{group.updated_at | dateTimeFormat}}
             </div>
         </div>
 
@@ -41,7 +43,8 @@
     </div>
 </template>
 <script>
-    import GroupEditModal from '../GroupEditModal/GroupEditModal.vue'
+    import GroupEditModal from '../GroupEditModal/GroupEditModal.vue';
+    import '../../filters/date-time-format.filter.js';
     export default {
         name: 'GroupView',
         props: {

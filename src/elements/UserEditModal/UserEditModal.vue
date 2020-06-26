@@ -280,12 +280,9 @@
             },
             onSaveClick () {
                 if (this.$refs.form.checkValidity() === false) {
-                    console.debug("Form not valid");
                     this.$refs.form.classList.add('was-validated');
                     return;
                 }
-
-            	console.debug('saving user', this.userToEdit);
                 this.saveUser()
                     .then(user => {
                         this.userToEdit.id = user.id;

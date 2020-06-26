@@ -39,9 +39,9 @@
             <div class="col-10 d-flex justify-content-start">
                 <div v-for="group in groups" class="row">
                     <div class="col">
-                        <div class="font-weight-italic">{{group.name}}</div>
-                        <ul v-if="group.permissions">
-                            <li v-for="permission in group.permissions">{{permission.name}}</li>
+                        <ul v-if="group.permissions" class="list-group mr-2">
+                            <li class="list-group-item"><h5>{{group.name}}</h5></li>
+                            <li v-for="permission in group.permissions" class="list-group-item">{{permission.name}}</li>
                         </ul>
                     </div>
                 </div>
@@ -53,7 +53,9 @@
                 Permissions
             </div>
             <div class="col-10 d-flex justify-content-start">
-                {{permissions.map(p => p.name).join(', ')}}
+                <ul v-if="permissions" class="list-group mr-2">
+                    <li v-for="permission in permissions" class="list-group-item">{{permission.name}}</li>
+                </ul>
             </div>
         </div>
 
@@ -62,7 +64,7 @@
                 Created at
             </div>
             <div class="col-10 d-flex justify-content-start">
-                {{user.created_at}}
+                {{user.created_at | dateTimeFormat}}
             </div>
         </div>
 
@@ -71,7 +73,7 @@
                 Last updated at
             </div>
             <div class="col-10 d-flex justify-content-start">
-                {{user.updated_at}}
+                {{user.updated_at | dateTimeFormat}}
             </div>
         </div>
 
@@ -83,7 +85,8 @@
     </div>
 </template>
 <script>
-    import UserEditModal from '../UserEditModal/UserEditModal.vue'
+    import UserEditModal from '../UserEditModal/UserEditModal.vue';
+    import '../../filters/date-time-format.filter.js';
     export default {
         name: 'UserView',
         props: {
@@ -100,36 +103,39 @@
             };
         },
         created () {
-            // TODO - this user
             document.addEventListener('user-edited.at', (e, p) => {
                 console.debug('user-edited.at', e);
-                // Object.assign(this.users.find(user => user.id === e.detail.user.id), e.detail.user);
+                if (e.detail.user.id === this.user.id) {
+                    this.init();
+                }
             });
         },
         watch: {
             userId: function (val) {
                 if (val) {
-                    this.fetchUser();
-                    this.fetchUserGroups()
-                        .then(this.fetchGroupPermissions);
-                    this.fetchUserPermissions();
+                    this.init();
                 }
             }
         },
         methods: {
+            init () {
+                this.fetchUser();
+                this.fetchUserGroups()
+                    .then(this.fetchGroupPermissions);
+                this.fetchUserPermissions();
+            },
             fetchUser () {
                 fetch(`${this.server}/auth/users/${this.userId}`)
                     .then(this.handleResponse)
                     .then(user => {
                         this.user = user;
-                        console.debug('user', this.user);
                     });
             },
             fetchUserGroups () {
                 return fetch(`${this.server}/auth/users/${this.userId}/groups`)
                     .then(this.handleResponse)
                     .then(groups => {
-                        console.debug('selected groups', groups);
+                        this.groups.length = 0;
                         let requests = [];
                         groups.forEach(group => {
                             this.fetchGroupPermission(group)
@@ -154,20 +160,15 @@
                     });
             },
             fetchGroupPermission (group) {
-                // let requests = [];
-                // this.groups.forEach(group => {
                 return fetch(`${this.server}/auth/groups/${group.id}/permissions`)
                     .then(this.handleResponse)
                     .then(permissions => {
-                        console.debug('permissions', permissions);
                         group.permissions = permissions;
                         return group;
                     })
                     .catch(e => {
                         console.error('Error fetching group permissions', e);
                     });
-                // });
-                // return Promise.all(requests);
             },
             handleResponse (response) {
                 return response.json()
