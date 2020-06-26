@@ -1,126 +1,126 @@
 <template>
-    <div class="user-list__wrapper">
+    <div class="group-list__wrapper container">
         <div class="row justify-content-sm-end">
             <div class="col-12 col-sm-8 col-md-6 col-lg-4">
-                <button class="btn btn-block btn-primary" v-on:click="onAddClick">Add User</button>
+                <button class="btn btn-block btn-primary" v-on:click="onAddGroupClick">Add Group</button>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-4">
             <div class="col">
-                <table class="table table-striped table-responsive-lg">
+                <table class="table">
                     <thead>
                         <tr>
-                            <th>Username</th>
                             <th>Name</th>
-                            <th>Email</th>
-                            <th>Admin</th>
                             <th width="1">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="user in users">
-                            <td>{{user.username}}</td>
-                            <td>{{user.fullname}}</td>
-                            <td>{{user.email}}</td>
-                            <td><input type="checkbox" :checked="user.admin" disabled></td>
-                            <td>
-                                <button class="btn btn-secondary btn-small" v-on:click="onViewClick(user.id)">View</button>
-                                <button class="btn btn-secondary btn-small" v-on:click="onEditClick(user)">Edit</button>
-                                <button class="btn btn-secondary btn-small">Delete</button>
-                            </td>
+                        <template v-if="groups.length && !loading">
+                            <tr v-for="group in groups" v-bind:key="group.id">
+                                <td>{{group.name}}</td>
+                                <td>
+                                    <button class="btn btn-secondary btn-small" v-on:click="onViewClick(group)">View</button>
+                                    <button class="btn btn-secondary btn-small" v-on:click="onEditClick(group)">Edit</button>
+                                    <button class="btn btn-secondary btn-small" v-on:click="onDeleteClick(group)">Delete</button>
+                                </td>
+                            </tr>
+                        </template>
+                        <tr v-if="!groups.length && !loading">
+                            <td colspan="3" class="text-center">No data</td>
                         </tr>
-                    </tbody>
+                        <tr v-if="loading">
+                            <td colspan="3" class="text-center">Loading...</td>
+                        </tr>
+                </tbody>
                 </table>
             </div>
         </div>
-        <user-edit-modal 
-            :user-id="userToEdit.id" 
-            :open-modal="openModal" 
-            :on-close="onModalClose">
-        </user-edit-modal>
+        <group-edit-modal 
+            :server="server"
+            :group-id="groupToEdit.id"
+            :open-modal="openModal">
+        </group-edit-modal>
     </div>
 </template>
+
 <script>
-    import UserEditModal from '../UserEditModal/UserEditModal.vue'
+    import GroupEditModal from '../GroupEditModal/GroupEditModal.vue'
     export default {
-        name: 'UserList',
+        name: 'GroupList',
         props: {
             server: String
         },
         data: () => {
             return {
-                users: [],
+                groups: [],
+                loading:false,
                 openModal: false,
-                userToEdit: {}
-            };
+                groupToEdit: {}
+            }
         },
         created () {
-            this.users.length = 0;
-            fetch(`${this.server}/auth/users`)
-                .then(this.handleResponse)
-                .then(json => {
-                    this.users.push(...json);
-                    console.debug('users', this.users);
+            this.loading = true;
+            fetch(`${this.server}/auth/groups`)
+                .then( res =>res.json())
+                .then(groups => {
+                    this.loading = false;
+                    this.groups = groups;
+                })
+                .catch(err=>{
+                    this.loading = false;
+                    console.debug('Error retrieving group list or parsing response', err)
                 });
 
-            document.addEventListener('user-created.ft', (e, p) => {
-                console.debug('user-created.ft', e);
-                this.users.push(e.detail.user);
+            document.addEventListener('group-created.at', (e, p) => {
+                this.groups.push(e.detail.group);
             });
 
-            document.addEventListener('user-edited.ft', (e, p) => {
-                console.debug('user-edited.ft', e);
-                Object.assign(this.users.find(user => user.id === e.detail.user.id), e.detail.user);
+            document.addEventListener('group-edited.at', (e, p) => {
+                Object.assign(this.groups.find(group => group.id === e.detail.group.id), e.detail.group);
             });
         },
         methods: {
-            handleResponse (response) {
-                return response.json()
-                    .then((json) => {
-                        if (!response.ok) {
-                            const error = Object.assign({}, json, {
-                                status: response.status,
-                                statusText: response.statusText,
-                            });
-
-                            return Promise.reject(error);
-                        }
-                        return json;
-                    });
-            },
-            onAddClick () {
-                this.userToEdit = {
-                    groups: [],
-                    permissions: []
-                };
+            onAddGroupClick () {
+                this.groupToEdit = {};
                 this.openModal = false;
                 window.setTimeout(() => {
                     this.openModal = true;    
                 });
             },
-            onEditClick (user) {
-                console.debug('edit click', user);
-                this.userToEdit = user;
+            onViewClick (group) {
+                let event = new CustomEvent('group-view.at', {detail: {group: group}});
+                this.$el.parentNode.dispatchEvent(event);
+            },
+            onEditClick (group) {
+                this.groupToEdit = group;
                 this.openModal = false;
                 window.setTimeout(() => {
-                    this.openModal = true;
+                    this.openModal = true;    
                 });
-            },
-            onViewClick (userId) {
-                let event = new CustomEvent('user-view.at', {detail: {userId}});
-                this.$el.parentNode.dispatchEvent(event);
             },
             onModalClose () {
                 this.openModal = false;
+            },
+            onDeleteClick (group) {
+                fetch(`${this.server}/auth/groups/${group.id}`,{
+                    method:'DELETE'
+                })
+                    .then(groups => {
+                        this.groups = this.groups.filter(grp=>grp.id !== group.id);
+                    })
+                    .catch(err => {
+                        this.loading = false;
+                        console.debug('Error removing group or parsing response', err)
+                    })
             }
         },
-        components: {UserEditModal}
+        components: {GroupEditModal}
     }
 </script>
 
 <style lang="scss">
     
-    .user-list__wrapper {
+    .group-list__wrapper {
         font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -148,9 +148,11 @@
             vertical-align: top;
             border-top: 1px solid #dee2e6;
         }
+
         .table td:last-of-type{
             white-space: nowrap;
         }
+
         .permissions {
             font-size: .8rem;
             font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;

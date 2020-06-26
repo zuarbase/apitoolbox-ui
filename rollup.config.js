@@ -12,12 +12,19 @@ import vue from 'rollup-plugin-vue'
 
 const inputs = [
     'src/apitoolbox-ui.js',
+    'src/elements/GroupEditModal/group-edit-modal.js',
+    'src/elements/GroupList/group-list.js',
+    'src/elements/GroupView/group-view.js',
     'src/elements/LoginForm/login-form.js',
+    'src/elements/PermissionEditModal/permission-edit-modal.js',
+    'src/elements/PermissionList/permission-list.js',
     'src/elements/SignUpForm/sign-up-form.js',
-    'src/elements/UserAddButton/user-add-button.js',
-    'src/elements/UserList/user-list.js',
     'src/elements/SubscribeModal/subscribe-modal.js',
-    'src/elements/SubscriptionList/subscription-list.js'
+    'src/elements/SubscriptionList/subscription-list.js',
+    'src/elements/UserAddButton/user-add-button.js',
+    'src/elements/UserEditModal/user-edit-modal.js',
+    'src/elements/UserList/user-list.js',
+    'src/elements/UserView/user-view.js'
 ];
 
 const plugins = [

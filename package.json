@@ -1,8 +1,9 @@
 {
   "name": "apitoolbox-ui",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "scripts": {
     "dev": "webpack-dev-server --config ./webpack.config.js --open --mode=development",
+    "dev-build": "rollup --config rollup.config.js --watch",
     "build": "rollup -c rollup.config.js",
     "examples": "cd dist && static-server -o --index examples.html"
   },
