@@ -1,37 +1,37 @@
 <template>
     <div class="group-view__wrapper container">
         <div class="row">
-            <div class="col-8">
+            <div class="col-4 d-flex justify-content-end"">
                 <h3>{{group.name}}</h3>
             </div>
-            <div class="col-4"><button class="btn btn-primary" v-on:click="onEditClick">Edit</button></div>
+            <div class="col-8 d-flex justify-content-end"><button class="btn btn-primary" v-on:click="onEditClick">Edit</button></div>
         </div>
 
         <div class="row py-2">
-            <div class="col-2 d-flex justify-content-end font-weight-bold">
+            <div class="col-4 d-flex justify-content-end font-weight-bold">
                 Permissions
             </div>
-            <div class="col-10 d-flex justify-content-start">
+            <div class="col-8 d-flex justify-content-start">
                 <ul v-if="permissions" class="list-group">
-                    <li v-for="permission in permissions" class="list-group-item">{{permission.name}}</li>
+                    <li v-for="permission in permissions" class="list-group-item">{{permission.alias}}</li>
                 </ul>
             </div>
         </div>
 
         <div class="row py-2">
-            <div class="col-2 d-flex justify-content-end font-weight-bold">
+            <div class="col-4 d-flex justify-content-end font-weight-bold">
                 Created at
             </div>
-            <div class="col-10 d-flex justify-content-start">
+            <div class="col-8 d-flex justify-content-start">
                 {{group.created_at | dateTimeFormat}}
             </div>
         </div>
 
         <div class="row py-2">
-            <div class="col-2 d-flex justify-content-end font-weight-bold">
+            <div class="col-4 d-flex justify-content-end font-weight-bold">
                 Last updated at
             </div>
-            <div class="col-10 d-flex justify-content-start">
+            <div class="col-8 d-flex justify-content-start">
                 {{group.updated_at | dateTimeFormat}}
             </div>
         </div>

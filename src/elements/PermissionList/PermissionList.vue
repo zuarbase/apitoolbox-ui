@@ -10,16 +10,16 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Name</th>
                             <th>Alias</th>
+                            <th>Name</th>
                             <th width="1">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <template v-if="permissions.length && !loading">
                             <tr v-for="permission in permissions" v-bind:key="permission.id">
-                                <td>{{permission.name}}</td>
                                 <td>{{permission.alias}}</td>
+                                <td>{{permission.name}}</td>
                                 <td>
                                     <button class="btn btn-secondary btn-small" v-on:click="onEditClick(permission)">Edit</button>
                                     <button class="btn btn-secondary btn-small" v-on:click="onDeleteClick(permission)">Delete</button>

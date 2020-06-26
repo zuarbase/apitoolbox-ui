@@ -1,78 +1,74 @@
 <template>
     <div class="user-view__wrapper container">
         <div class="row">
-            <div class="col-8">
+            <div class="col-4 d-flex justify-content-end">
                 <h3>{{user.fullname}}</h3>
             </div>
-            <div class="col-4"><button class="btn btn-primary" v-on:click="onEditClick">Edit</button></div>
+            <div class="col-8 d-flex justify-content-end"><button class="btn btn-primary" v-on:click="onEditClick">Edit</button></div>
         </div>
         <div class="row py-2">
-            <div class="col-2 d-flex justify-content-end font-weight-bold">
+            <div class="col-4 d-flex justify-content-end font-weight-bold">
                 ID    
             </div>
-            <div class="col-10 d-flex justify-content-start">
+            <div class="col-8 d-flex justify-content-start">
                 {{user.id}}
             </div>
         </div>
         <div class="row py-2">
-            <div class="col-2 d-flex justify-content-end font-weight-bold">
+            <div class="col-4 d-flex justify-content-end font-weight-bold">
                 Username
             </div>
-            <div class="col-10 d-flex justify-content-start">
+            <div class="col-8 d-flex justify-content-start">
                 {{user.username}}
             </div>
         </div>
 
         <div class="row py-2">
-            <div class="col-2 d-flex justify-content-end font-weight-bold">
+            <div class="col-4 d-flex justify-content-end font-weight-bold">
                 Email
             </div>
-            <div class="col-10 d-flex justify-content-start">
+            <div class="col-8 d-flex justify-content-start">
                 {{user.email}}
             </div>
         </div>
 
         <div class="row py-2">
-            <div class="col-2 d-flex justify-content-end font-weight-bold">
+            <div class="col-4 d-flex justify-content-end font-weight-bold">
                 Groups
             </div>
-            <div class="col-10 d-flex justify-content-start">
-                <div v-for="group in groups" class="row">
-                    <div class="col">
-                        <ul v-if="group.permissions" class="list-group mr-2">
-                            <li class="list-group-item"><h5>{{group.name}}</h5></li>
-                            <li v-for="permission in group.permissions" class="list-group-item">{{permission.name}}</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row py-2">
-            <div class="col-2 d-flex justify-content-end font-weight-bold">
-                Permissions
-            </div>
-            <div class="col-10 d-flex justify-content-start">
-                <ul v-if="permissions" class="list-group mr-2">
-                    <li v-for="permission in permissions" class="list-group-item">{{permission.name}}</li>
+            <div class="col-8 d-flex flex-wrap justify-content-start">
+                <ul v-for="group in groups" class="list-group mr-2 mb-2">
+                    <li class="list-group-item"><h5>{{group.name}}</h5></li>
+                    <li v-for="permission in group.permissions" class="list-group-item text-nowrap">{{permission.alias}}</li>
                 </ul>
             </div>
         </div>
 
         <div class="row py-2">
-            <div class="col-2 d-flex justify-content-end font-weight-bold">
+            <div class="col-4 d-flex justify-content-end font-weight-bold">
+                Permissions
+            </div>
+            <div class="col-8 d-flex justify-content-start">
+                <ul v-if="permissions" class="list-group mr-2">
+                    <li v-for="permission in permissions" class="list-group-item">{{permission.alias}}</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row py-2">
+            <div class="col-4 d-flex justify-content-end font-weight-bold">
                 Created at
             </div>
-            <div class="col-10 d-flex justify-content-start">
+            <div class="col-8 d-flex justify-content-start">
                 {{user.created_at | dateTimeFormat}}
             </div>
         </div>
 
         <div class="row py-2">
-            <div class="col-2 d-flex justify-content-end font-weight-bold">
+            <div class="col-4 d-flex justify-content-end font-weight-bold">
                 Last updated at
             </div>
-            <div class="col-10 d-flex justify-content-start">
+            <div class="col-8 d-flex justify-content-start">
                 {{user.updated_at | dateTimeFormat}}
             </div>
         </div>
