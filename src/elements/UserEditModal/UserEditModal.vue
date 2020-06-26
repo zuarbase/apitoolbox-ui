@@ -25,7 +25,7 @@
                                                     name="username" 
                                                     placeholder="Username"
                                                     ref="username"
-                                                    v-model="user.username"
+                                                    v-model="userToEdit.username"
                                                     :disabled="userId"
                                                     required/>
                                                     <div class="invalid-feedback">Please provide a username</div>
@@ -39,7 +39,7 @@
                                                     name="name" 
                                                     placeholder="Name"
                                                     ref="name"
-                                                    v-model="user.fullname"
+                                                    v-model="userToEdit.fullname"
                                                     required />
                                             </div>
                                             <div class="form-group">
@@ -52,7 +52,7 @@
                                                     placeholder="Email"
                                                     ref="email"
                                                     autocomplete="new-email" 
-                                                    v-model="user.email"
+                                                    v-model="userToEdit.email"
                                                     required />
                                                     <div class="invalid-feedback">Please provide a valid email address</div>
                                             </div>
@@ -95,8 +95,10 @@
                                                         id="groups"
                 	                                	tag-placeholder="Add as new group" 
                 	                                	placeholder="Groups" 
+                                                        label="name"
+                                                        track-by="id"
                 	                                	:multiple="true" 
-                	                                	:taggable="true" 
+                	                                	:taggable="false" 
                 	                                	@tag="addGroup"></multiselect>
                 	                            </div>
                 					            <div class="form-group">
@@ -108,7 +110,9 @@
                 	                                	tag-placeholder="Add as new permission"
                 	                                	placeholder="Permissions" 
                 	                                	:multiple="true" 
-                	                                	:taggable="true" 
+                	                                	:taggable="false"
+                                                        track-by="id"
+                                                        label="alias"
                 	                                	@tag="addPermission"></multiselect>
                 	                            </div>
                                             </div>
@@ -120,12 +124,18 @@
                                                             type="checkbox"
                                                             class="form-check-input"
                                                             id="is_admin"
-                                                            v-model="user.admin"
-                                                            name="is_admin"
-                                                            required>
+                                                            v-model="userToEdit.admin"
+                                                            name="is_admin">
                                                         Administrator
                                                     </label>
                                                 </div>
+                                            </div>
+
+                                            <div v-if="error" class="alert alert-danger" role="alert">
+                                                <h4 class="alert-heading">{{error.status}}</h4>
+                                                {{error.statusText}}
+                                                <hr v-if="error && error.detail">
+                                                <p class="mb-0">{{error.detail}}</p>
                                             </div>
                                         </form>
                                     </div>
@@ -144,7 +154,7 @@
 </template>
 
 <script>
-	import Multiselect from 'vue-multiselect'
+	import Multiselect from 'vue-multiselect';
     export default {
         name: 'UserEditModal',
         props: {
@@ -157,17 +167,17 @@
         },
         data: () => {
             return {
-                user: {}, // form state
-                userToEdit: {}, // from API
+                userToEdit: {},
                 password: '', // Password change model
                 passwordConfirm: '',
                 passwordMatchError: false,
                 passwordLengthError: false,
                 groups: ['Administrator', 'Editor', 'User'],
                 selectedGroups: [], // Groups tag component model
-                permissions: ['Read all users', 'Write all users', 'Edit all users', 'Delete all users'],
+                permissions: [],
                 selectedPermissions: [], // Permissions tag component model
-                isOpen: false // Actual modal state
+                isOpen: false, // Actual modal state
+                error: null // {status, statusText, detail}
             }
         },
         watch: {
@@ -177,6 +187,10 @@
             		return;
             	}
                 if (val) {
+                    this.userToEdit = {};
+                    this.password = '';
+                    this.passwordConfirm = '';
+                    this.error = null;
                     this.$refs.form.classList.remove('was-validated');
                     this.server = this.server || '';
 
@@ -193,16 +207,12 @@
                             this.permissions.length = 0;
                             this.permissions.push(...permissions);
                         });
-                    let userPromise = this.userId ? this.fetchUser() : Promise.resolve({});
-
-                	userPromise.then(user => {
-                        Object.assign(this.userToEdit, user);
-                        // let userCopy = Object.assign({}, this.userToEdit);
-                        let {groups, permissions} = user;
-                        Object.assign(this.user, user);
-                        this.selectedGroups.push(...groups || []);
-                        this.selectedPermissions.push(...permissions || []);
-                    });
+                    
+                    if (this.userId) {
+                        this.fetchUser();
+                        this.fetchUserGroups();
+                        this.fetchUserPermissions();
+                    }
 
                     this.open()
                 } else {
@@ -220,6 +230,33 @@
             fetchUser () {
                 return fetch(`${this.server}/auth/users/${this.userId}`)
                     .then(this.handleResponse)
+                    .then(user => {
+                        this.userToEdit = {};
+                        Object.assign(this.userToEdit, user);
+                    })
+                    .catch(e => {
+                        console.error('Error fetching user to edit', e);
+                    });
+            },
+            fetchUserGroups () {
+                return fetch(`${this.server}/auth/users/${this.userId}/groups`)
+                    .then(this.handleResponse)
+                    .then(groups => {
+                        console.debug('selected groups', groups);
+                        this.selectedGroups.length = 0;
+                        this.selectedGroups.push(...groups);
+                    })
+                    .catch(e => {
+                        console.error('Error fetching user groups', e);
+                    });
+            },
+            fetchUserPermissions () {
+                return fetch(`${this.server}/auth/users/${this.userId}/permissions`)
+                    .then(this.handleResponse)
+                    .then(permissions => {
+                        this.selectedPermissions.length = 0;
+                        this.selectedPermissions.push(...permissions);
+                    })
                     .catch(e => {
                         console.error('Error fetching user to edit', e);
                     });
@@ -247,54 +284,65 @@
                     this.$refs.form.classList.add('was-validated');
                     return;
                 }
-            	console.debug('saving groups', this.selectedGroups);
-            	Object.assign(this.userToEdit, this.user);
-            	this.userToEdit.groups = [];
-            	this.userToEdit.permissions = [];
-            	this.userToEdit.groups.push(...this.selectedGroups);
-            	this.userToEdit.permissions.push(...this.selectedPermissions);
-                let requestBody = Object.assign({}, this.userToEdit);
 
+            	console.debug('saving user', this.userToEdit);
+                this.saveUser()
+                    .then(user => {
+                        this.userToEdit.id = user.id;
+                        return Promise.all([this.saveUserGroups(), this.saveUserPermissions()]);
+                    })
+                    .then(responses =>  {
+                        let event;
+                        if (this.userToEdit.id) {
+                            event = new CustomEvent('user-edited.at', {detail: {user: this.userToEdit}})
+                        } else {
+                            event = new CustomEvent('user-created.at', {detail: {user: this.userToEdit}})
+                        }
+                        document.dispatchEvent(event);
+                        this.close();
+                    })
+                    .catch(response => {
+                        console.error('Error saving user', response);
+                    });
+            },
+            saveUser () {
+                let requestBody = Object.assign({}, this.userToEdit);
+                if (this.password) {
+                    requestBody.password = this.password;
+                }
                 let url = this.userToEdit.id ? `${this.server}/auth/users/${this.userToEdit.id}` : `${this.server}/users`;
                 let method = this.userToEdit.id ? 'PUT' : 'POST';
-                fetch(url, {
+                return fetch(url, {
                     method,
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(requestBody)
                 })
-                .then(response => {
-                    if (response.ok) {
-                        // Success
-                        let event;
-                        if (this.userToEdit.id) {
-                            event = new CustomEvent('user-edited.ft', {detail: {user: Object.assign({id:3}, this.userToEdit)}})
-                        } else {
-                            event = new CustomEvent('user-created.ft', {detail: {user: Object.assign({id:3}, this.userToEdit)}})
-                        }
-                        document.dispatchEvent(event);
-                        this.close()
-                    } else {
-                        response.json().then(json => {
-                            json.detail.forEach(error => {
-                                error.loc.forEach(loc => {
-                                    if (this.$refs[loc]) {
-                                        this.$refs[loc].classList.add('error')
-                                    }
-                                })
-                            })
-                        })
-                    }
-                })
-                .catch(response => {
-                    console.debug('Error creating user or parsing response', response)
-                })
-
-                document.dispatchEvent(event)
-                this.close()
+                .then(this.handleResponse);
             },
-
+            saveUserGroups () {
+                let requestBody = {groups: this.selectedGroups.map(grp => grp.id)};
+                return fetch(`${this.server}/auth/users/${this.userToEdit.id}/groups`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                })
+                .then(this.handleResponse);
+            },
+            saveUserPermissions () {
+                let requestBody = {permissions: this.selectedPermissions.map(grp => grp.id)};
+                return fetch(`${this.server}/auth/users/${this.userToEdit.id}/permissions`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                })
+                .then(this.handleResponse);
+            },
             addGroup (newGroup) {
       			this.user.groups.push(newGroup)
       			this.groups.push(newGroup)
@@ -331,8 +379,9 @@
                             const error = Object.assign({}, json, {
                                 status: response.status,
                                 statusText: response.statusText,
+                                detail: response.detail
                             });
-
+                            this.error = error;
                             return Promise.reject(error);
                         }
                         return json;

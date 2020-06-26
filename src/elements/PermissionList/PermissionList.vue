@@ -1,7 +1,7 @@
 <template>
     <div class="permission-list__wrapper">
         <div class="row justify-content-sm-end">
-            <div class="col-2">
+            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
                 <button class="btn btn-block btn-primary" v-on:click="onAddPermissionClick">Add Permission</button>
             </div>
         </div>
@@ -38,9 +38,8 @@
         </div>
         <permission-edit-modal 
             :server="server"
-            :permission-to-edit="permissionToEdit" 
-            :open-modal="openModal" 
-            :on-close="onModalClose">
+            :permission-id="permissionToEdit.id"
+            :open-modal="openModal">
         </permission-edit-modal>
     </div>
 </template>
@@ -87,11 +86,17 @@
         methods: {
             onAddPermissionClick () {
                 this.permissionToEdit = {};
-                this.openModal = true;
+                this.openModal = false;
+                window.setTimeout(() => {
+                    this.openModal = true;    
+                });
             },
             onEditClick (permission) {
                 this.permissionToEdit = permission;
-                this.openModal = true;
+                this.openModal = false;
+                window.setTimeout(() => {
+                    this.openModal = true;    
+                });
             },
             onModalClose () {
                 this.openModal = false;

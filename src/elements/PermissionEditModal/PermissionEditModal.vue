@@ -1,52 +1,61 @@
 <template>
-    <div v-show="false" ref="permissionModalTemplate">
-        <div class="modal__wrapper" ref="permissionModalWrapper">
-            <div class="modal-backdrop">
-                <div
-                    class="modal"
-                    v-bind:class="{ show: isOpen, 'd-block': isOpen }"
-                >
-                    <header class="header">
-                        <h1 v-if="!permission.id">Add User</h1>
-                        <h1 v-if="permission.id">Edit User</h1>
-                    </header>
-                    <main class="main">
-                        <form class="form" novalidate>
-                            <div class="form-group">
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    name="name"
-                                    placeholder="Name"
-                                    ref="name"
-                                    v-model="permission.name"
-                                    :required="true"
-                                />
+    <div v-show="false" ref="modalTemplate">
+        <div class="modal-window permission-edit-modal" ref="modalWrapper">
+            <div class="modal fade" ref="modal">
+                <div class="modal-dialog modal-md modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <header class="modal-header">
+                            <h3 v-if="!permissionId">Add Permission</h3>
+                            <h3 v-if="permissionId">Edit Permission</h3>
+                        </header>
+                        <main class="modal-body">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col">
+                                        <form class="form needs-validation" ref="form" novalidate>
+                                            <div class="form-group">
+                                                <label for="name">Name</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="name"
+                                                    name="name"
+                                                    placeholder="Name"
+                                                    ref="name"
+                                                    v-model="permissionToEdit.name"
+                                                    :required="true">
+                                                <div class="invalid-feedback">Please provide a permission string in the format OBJECT.ID.ACTION. Eg; USERS.*.READ</div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="alias">Alias</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="alias"
+                                                    name="alias"
+                                                    placeholder="Alias"
+                                                    ref="alias"
+                                                    v-model="permissionToEdit.alias"
+                                                    :required="true">
+                                                <div class="invalid-feedback">Please provide a human-readable alias for the permission. Eg; Read all users.</div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    name="alias"
-                                    placeholder="Alias"
-                                    ref="alias"
-                                    v-model="permission.alias"
-                                    :required="true"
-                                />
-                            </div>
-                        </form>
-                    </main>
-                    <footer class="footer">
-                        <button v-on:click="onCancelClick" class="btn btn-link">
-                            Cancel
-                        </button>
-                        <button
-                            v-on:click="onSaveClick"
-                            class="btn btn-primary"
-                        >
-                            Save
-                        </button>
-                    </footer>
+                        </main>
+                        <footer class="modal-footer">
+                            <button v-on:click="onCancelClick" class="btn btn-link">
+                                Cancel
+                            </button>
+                            <button
+                                v-on:click="onSaveClick"
+                                class="btn btn-primary"
+                            >
+                                Save
+                            </button>
+                        </footer>
+                    </div>
                 </div>
             </div>
         </div>
@@ -57,14 +66,16 @@
 export default {
     name: "PermissionEditModal",
     props: {
-        server: String,
+        server: {
+            type: String,
+            default: ''
+        },
         openModal: Boolean, // Requested modal state
-        onClose: Function,
-        permissionToEdit: Object
+        permissionId: String
     },
     data: () => {
         return {
-            permission: {},
+            permissionToEdit: {},
             isOpen: false // Actual modal state
         };
     },
@@ -75,9 +86,15 @@ export default {
                 return;
             }
             if (val) {
-                if (this.permissionToEdit.id) {
-                    let permissionCopy = Object.assign({}, this.permissionToEdit);
-                    Object.assign(this.permission, permissionCopy);
+                if (this.permissionId) {
+                    this.fetchPermission(this.permissionId)
+                        .then(permission => {
+                            this.permissionToEdit = {};
+                            console.debug('this', this);
+                            console.debug('this.permissionToEdit', this.permissionToEdit);
+                            console.debug('permission to edit', permission);
+                            Object.assign(this.permissionToEdit, permission);
+                        });
                 }
                 this.open();
             } else {
@@ -90,11 +107,13 @@ export default {
             this.close();
         },
         onSaveClick() {
+            if (this.$refs.form.checkValidity() === false) {
+                this.$refs.form.classList.add('was-validated');
+                return;
+            }
             let request;
-            Object.assign(this.permissionToEdit, this.permission);
-
-            if (this.permissionToEdit.id) {
-                request = fetch(`${this.server}/auth/permissions/${this.permissionToEdit.id}`, {
+            if (this.permissionId) {
+                request = fetch(`${this.server}/auth/permissions/${this.permissionId}`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json"
@@ -111,7 +130,7 @@ export default {
                 });
             }
             request
-                .then(res => res.json())
+                .then(this.handleResponse)
                 .then(permission=>{
                     let event;
                     if (this.permissionToEdit.id) {
@@ -126,146 +145,81 @@ export default {
                 })
             this.close();
         },
-        open() {
-            console.debug("Opening modal");
-            document.body.appendChild(this.$refs.permissionModalWrapper);
+        fetchPermission (id) {
+            return fetch(`${this.server}/auth/permissions/${id}`)
+                .then(this.handleResponse)
+                .catch(e => {
+                    console.error('Error fetching permission', e);
+                });
+        },
+        handleResponse (response) {
+            return response.json()
+                .then((json) => {
+                    if (!response.ok) {
+                        const error = Object.assign({}, json, {
+                            status: response.status,
+                            statusText: response.statusText,
+                        });
+
+                        return Promise.reject(error);
+                    }
+                    return json;
+                });
+        },
+        open () {
+            document.body.appendChild(this.$refs.modalWrapper);
+            window.setTimeout(() => {
+                this.$refs.modal.classList.add('show');    
+            }, 100);
+            
             this.isOpen = true;
         },
-        close() {
-            this.$refs.permissionModalTemplate.appendChild(
-                this.$refs.permissionModalWrapper
-            );
+        close () {
+            this.$refs.modal.classList.remove('show');
+            this.$refs.form.classList.remove('was-validated');
+            window.setTimeout(() => {
+                this.$refs.modalTemplate.appendChild(this.$refs.modalWrapper);
+            }, 300);
             this.isOpen = false;
-            if (typeof this.onClose === "function") {
-                this.onClose();
-            }
         }
     }
 };
 </script>
 
 <style lang="scss">
-.modal__wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 999;
-
-    *,
-    ::after,
-    ::before {
-        box-sizing: border-box;
-    }
-
-    .modal-backdrop {
+    .permission-edit-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.4);
-        pointer-events: none;
+        z-index: 999;
+        background-color: rgba(0, 0, 0, .4);
         transition: all 0.3s;
-    }
-    .modal {
-        width: 600px;
-        height: auto;
-        position: absolute;
-        top: 20%;
-        left: 50%;
-        transform: translate(-50%, -20%);
-        background: #ffffff;
-        border-radius: 3px;
-        pointer-events: all;
-    }
-    .header {
-        padding: 1rem;
-        border-bottom: solid 1px #e3e3e3;
-        h1 {
-            font-size: 1.4rem;
+        *, ::after, ::before {
+            box-sizing: border-box;
+        }
+        .modal {
+            display: block;
+        }
+        .modal-dialog {
+            max-width: 500px;
+            position: relative;
+            margin: 1.75rem auto;
+            transition: transform .3s ease-out;
+        }
+        .modal-content {
+            height: auto;
+            background: #ffffff;
+            pointer-events: all;
+        }
+
+        .form-control:focus {
+            outline: 0;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
         }
     }
-    .main {
-        padding: 1rem;
-        background-color: #fffbfc;
-    }
-    .btn {
-        border-radius: 2px;
-        padding: 0.5rem 1rem;
-        line-height: 1.5rem;
-        font-size: 1rem;
-        font-weight: bold;
-        border: none;
-        color: #fff;
-    }
-    .btn-primary {
-        background: #fa225b;
-    }
-    .btn-link {
-        color: #fa225b;
-        background-color: white;
-    }
-    .btn-block {
-        display: block;
-        width: 100%;
-    }
-    .btn:hover {
-        cursor: pointer;
-        box-shadow: 0 0 10px 4px rgba(250, 34, 91, 0.1);
-    }
-    .btn:focus {
-        outline: 0;
-    }
-
-    .form {
-        font-size: 13px;
-        position: relative;
-    }
-    .form-group {
-        margin-bottom: 1rem;
-    }
-    .form-control {
-        display: block;
-        width: 100%;
-        padding: 0.375rem 0.75rem;
-        font-size: 1rem;
-        line-height: 1.5;
-        border-radius: 2px;
-        min-height: 41px;
-        background: #fff;
-        border: 1px solid #e3e3e3;
-        box-shadow: none !important;
-    }
-    .form-control:focus {
-        outline: 0;
-    }
-
-    .password-confirm {
-        margin-top: -2px;
-        border-top-left-radius: 0px;
-        border-top-right-radius: 0px;
-    }
-    .form-control.error,
-    .form-control.vf-invalid {
-        border-color: #d9534f;
-        background: #fff0f4;
-    }
-    .error-message {
-        color: #d9534f;
-        font-size: 0.8rem;
-    }
-
-    .multiselect__tags {
-        border-radius: 2px;
-    }
-
-    .footer {
-        display: flex;
-        justify-content: flex-end;
-        border-top: solid 1px #e3e3e3;
-        padding: 1rem;
-        .btn {
-            margin-left: 1rem;
-        }
-    }
-}
 </style>
