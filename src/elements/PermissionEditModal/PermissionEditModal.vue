@@ -14,19 +14,6 @@
                                     <div class="col">
                                         <form class="form needs-validation" ref="form" novalidate>
                                             <div class="form-group">
-                                                <label for="name">Name</label>
-                                                <input
-                                                    type="text"
-                                                    class="form-control"
-                                                    id="name"
-                                                    name="name"
-                                                    placeholder="Name"
-                                                    ref="name"
-                                                    v-model="permissionToEdit.name"
-                                                    :required="true">
-                                                <div class="invalid-feedback">Please provide a permission string in the format OBJECT.ID.ACTION. Eg; USERS.*.READ</div>
-                                            </div>
-                                            <div class="form-group">
                                                 <label for="alias">Alias</label>
                                                 <input
                                                     type="text"
@@ -39,13 +26,26 @@
                                                     :required="true">
                                                 <div class="invalid-feedback">Please provide a human-readable alias for the permission. Eg; Read all users.</div>
                                             </div>
+                                            <div class="form-group">
+                                                <label for="name">Name</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="name"
+                                                    name="name"
+                                                    placeholder="Name"
+                                                    ref="name"
+                                                    v-model="permissionToEdit.name"
+                                                    :required="true">
+                                                <div class="invalid-feedback">Please provide a permission string in the format OBJECT.ID.ACTION. Eg; USERS.*.READ</div>
+                                            </div>
                                         </form>
                                     </div>
                                 </div>
                             </div>
                         </main>
                         <footer class="modal-footer">
-                            <button v-on:click="onCancelClick" class="btn btn-link">
+                            <button v-on:click="onCancelClick" class="btn btn-secondary">
                                 Cancel
                             </button>
                             <button

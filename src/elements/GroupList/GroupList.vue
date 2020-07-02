@@ -1,13 +1,16 @@
 <template>
     <div class="group-list__wrapper container">
         <div class="row justify-content-sm-end">
-            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
-                <button class="btn btn-block btn-primary" v-on:click="onAddGroupClick">Add Group</button>
+            <div class="col col-sm-6 d-flex justify-content-start">
+                <h3>Groups</h3>
+            </div>
+            <div class="col col-sm-6 d-flex justify-content-end">
+                <button class="btn btn-primary" v-on:click="onAddGroupClick">Add Group</button>
             </div>
         </div>
         <div class="row mt-4">
             <div class="col">
-                <table class="table">
+                <table class="table table-striped table-responsive-xs">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -64,7 +67,7 @@
                 .then( res =>res.json())
                 .then(groups => {
                     this.loading = false;
-                    this.groups = groups;
+                    this.groups = groups.sort(groupSort);
                 })
                 .catch(err=>{
                     this.loading = false;
@@ -73,6 +76,7 @@
 
             document.addEventListener('group-created.at', (e, p) => {
                 this.groups.push(e.detail.group);
+                this.groups.sort(groupSort);
             });
 
             document.addEventListener('group-edited.at', (e, p) => {
@@ -115,6 +119,9 @@
             }
         },
         components: {GroupEditModal}
+    }
+    function groupSort (a, b) {
+        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
     }
 </script>
 

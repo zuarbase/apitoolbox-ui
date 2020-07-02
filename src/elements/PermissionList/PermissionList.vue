@@ -1,13 +1,16 @@
 <template>
     <div class="permission-list__wrapper">
-        <div class="row justify-content-sm-end">
-            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
-                <button class="btn btn-block btn-primary" v-on:click="onAddPermissionClick">Add Permission</button>
+        <div class="row">
+            <div class="col col-sm-6 d-flex justify-content-start">
+                <h3>Permissions</h3>
+            </div>
+            <div class="col col-sm-6 d-flex justify-content-end">
+                <button class="btn btn-primary" v-on:click="onAddPermissionClick">Add Permission</button>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <table class="table">
+                <table class="table table-striped table-responsive-xs">
                     <thead>
                         <tr>
                             <th>Alias</th>
@@ -66,7 +69,7 @@
                 .then(permissions => {
                     this.loading = false;
                     this.permissions = permissions;
-                    console.log('permissions request success', permissions)
+                    this.permissions.sort(permissionSort);
                 })
                 .catch(err=>{
                     this.loading = false;
@@ -74,13 +77,12 @@
                 })
 
             document.addEventListener('permission-created.ft', (e, p) => {
-                console.debug('permission-created.ft', e)
-                this.permissions.push(e.detail.permission)
+                this.permissions.push(e.detail.permission);
+                this.permissions.sort(permissionSort);
             })
 
             document.addEventListener('permission-edited.ft', (e, p) => {
-                console.debug('permission-edited.ft', e)
-                Object.assign(this.permissions.find(permission => permission.id === e.detail.permission.id), e.detail.permission)
+                Object.assign(this.permissions.find(permission => permission.id === e.detail.permission.id), e.detail.permission);
             })
         },
         methods: {
@@ -115,6 +117,9 @@
             }
         },
         components: {PermissionEditModal}
+    }
+    function permissionSort (a, b) {
+        return a.alias.toLowerCase().localeCompare(b.alias.toLowerCase());
     }
 </script>
 

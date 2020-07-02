@@ -1,13 +1,16 @@
 <template>
     <div class="user-list__wrapper">
         <div class="row justify-content-sm-end">
-            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
-                <button class="btn btn-block btn-primary" v-on:click="onAddClick">Add User</button>
+            <div class="col col-sm-6 d-flex justify-content-start">
+                <h3>Users</h3>
+            </div>
+            <div class="col col-sm-6 d-flex justify-content-end">
+                <button class="btn btn-primary" v-on:click="onAddClick">Add User</button>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <table class="table table-striped table-responsive-lg">
+                <table class="table table-striped table-responsive-xs">
                     <thead>
                         <tr>
                             <th>Username</th>
@@ -26,7 +29,7 @@
                             <td>
                                 <button class="btn btn-secondary btn-small" v-on:click="onViewClick(user.id)">View</button>
                                 <button class="btn btn-secondary btn-small" v-on:click="onEditClick(user)">Edit</button>
-                                <button class="btn btn-secondary btn-small">Delete</button>
+                                <button class="btn btn-secondary btn-small" v-on:click="onDeleteClick(user)">Delete</button>
                             </td>
                         </tr>
                     </tbody>
@@ -60,15 +63,17 @@
                 .then(this.handleResponse)
                 .then(json => {
                     this.users.push(...json);
+                    this.users.sort(userSort);
                     console.debug('users', this.users);
                 });
 
-            document.addEventListener('user-created.ft', (e, p) => {
+            document.addEventListener('user-created.at', (e, p) => {
                 console.debug('user-created.ft', e);
                 this.users.push(e.detail.user);
+                this.users.sort(userSort);
             });
 
-            document.addEventListener('user-edited.ft', (e, p) => {
+            document.addEventListener('user-edited.at', (e, p) => {
                 console.debug('user-edited.ft', e);
                 Object.assign(this.users.find(user => user.id === e.detail.user.id), e.detail.user);
             });
@@ -110,11 +115,27 @@
                 let event = new CustomEvent('user-view.at', {detail: {userId}});
                 this.$el.parentNode.dispatchEvent(event);
             },
+            onDeleteClick (user) {
+                fetch(`${this.server}/auth/users/${user.id}`,{
+                    method:'DELETE'
+                })
+                .then(() => {
+                    this.users = this.users.filter(usr=>usr.id !== user.id);
+                })
+                .catch(err => {
+                    this.loading = false;
+                    console.debug('Error removing user or parsing response', err)
+                })
+            },
             onModalClose () {
                 this.openModal = false;
             }
         },
         components: {UserEditModal}
+    }
+
+    function userSort (a, b) {
+        return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
     }
 </script>
 

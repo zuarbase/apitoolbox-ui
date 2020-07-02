@@ -46,7 +46,7 @@
                             </div>
                         </main>
                         <footer class="modal-footer">
-                            <button v-on:click="onCancelClick" class="btn btn-link">
+                            <button v-on:click="onCancelClick" class="btn btn-secondary">
                                 Cancel
                             </button>
                             <button
@@ -156,6 +156,7 @@ export default {
 
                     this.selectedPermissions.length = 0;
                     this.selectedPermissions.push(...permissions);
+                    this.selectedPermissions.sort(permissionSort);
                 })
                 .catch(e => {
                     console.error('Error fetching group', e);
@@ -167,7 +168,7 @@ export default {
                 .then(permissions => {
                     this.permissions = [];
                     this.permissions.push(...permissions);
-                    console.debug('permissions', this.permissions);
+                    this.permissions.sort(permissionSort);
                 })
                 .catch(e => {
                     console.error('Error fetching permissions', e);
@@ -265,6 +266,9 @@ export default {
         Multiselect
     }
 };
+function permissionSort (a, b) {
+    return a.alias.toLowerCase().localeCompare(b.alias.toLowerCase());
+}
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style lang="scss">

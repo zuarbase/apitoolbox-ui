@@ -57,6 +57,15 @@
 
         <div class="row py-2">
             <div class="col-4 d-flex justify-content-end font-weight-bold">
+                Is Admin
+            </div>
+            <div class="col-8 d-flex justify-content-start">
+                {{user.admin ? 'TRUE' : 'FALSE'}}
+            </div>
+        </div>
+
+        <div class="row py-2">
+            <div class="col-4 d-flex justify-content-end font-weight-bold">
                 Created at
             </div>
             <div class="col-8 d-flex justify-content-start">
@@ -100,7 +109,6 @@
         },
         created () {
             document.addEventListener('user-edited.at', (e, p) => {
-                console.debug('user-edited.at', e);
                 if (e.detail.user.id === this.user.id) {
                     this.init();
                 }
@@ -136,7 +144,8 @@
                         groups.forEach(group => {
                             this.fetchGroupPermission(group)
                                 .then(() => {
-                                    this.groups.push(group);       
+                                    this.groups.push(group);
+                                    this.groups.sort(groupSort);
                                 });
                         });
                         return Promise.all(requests);
@@ -150,6 +159,7 @@
                     .then(this.handleResponse)
                     .then(permissions => {
                         this.permissions = permissions;
+                        this.permissions.sort(permissionSort);
                     })
                     .catch(e => {
                         console.error('Error fetching user to edit', e);
@@ -160,6 +170,7 @@
                     .then(this.handleResponse)
                     .then(permissions => {
                         group.permissions = permissions;
+                        group.permissions.sort(permissionSort);
                         return group;
                     })
                     .catch(e => {
@@ -188,6 +199,12 @@
             }
         },
         components: {UserEditModal}
+    }
+    function groupSort (a, b) {
+        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+    }
+    function permissionSort (a, b) {
+        return a.alias.toLowerCase().localeCompare(b.alias.toLowerCase());
     }
 </script>
 

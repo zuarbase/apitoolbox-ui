@@ -53,7 +53,7 @@
                                                     ref="email"
                                                     autocomplete="new-email" 
                                                     v-model="userToEdit.email"
-                                                    required />
+                                                     />
                                                     <div class="invalid-feedback">Please provide a valid email address</div>
                                             </div>
 
@@ -143,7 +143,7 @@
                             </div>
                         </main>
                         <footer class="modal-footer">
-                            <button v-on:click="onCancelClick" class="btn btn-link">Cancel</button>
+                            <button v-on:click="onCancelClick" class="btn btn-secondary">Cancel</button>
                             <button v-on:click="onSaveClick" class="btn btn-primary">Save</button>
                         </footer>
                     </div>
@@ -167,6 +167,7 @@
         },
         data: () => {
             return {
+                isEdit: false,
                 userToEdit: {},
                 password: '', // Password change model
                 passwordConfirm: '',
@@ -187,6 +188,7 @@
             		return;
             	}
                 if (val) {
+                    this.isEdit = !!this.userId;
                     this.userToEdit = {};
                     this.password = '';
                     this.passwordConfirm = '';
@@ -197,16 +199,8 @@
                 	this.selectedGroups.length = 0;
                 	this.selectedPermissions.length = 0;
                     
-                    let groupsPromise = this.fetchGroups()
-                        .then(groups => {
-                            this.groups.length = 0;
-                            this.groups.push(...groups);
-                        });
-                    let permissionsPromise = this.fetchPermissions()
-                        .then(permissions => {
-                            this.permissions.length = 0;
-                            this.permissions.push(...permissions);
-                        });
+                    this.fetchGroups();
+                    this.fetchPermissions();
                     
                     if (this.userId) {
                         this.fetchUser();
@@ -264,6 +258,11 @@
             fetchGroups () {
                 return fetch(`${this.server}/auth/groups`)
                     .then(this.handleResponse)
+                    .then(groups => {
+                        this.groups.length = 0;
+                        this.groups.push(...groups);
+                        this.groups.sort(groupSort);
+                    })
                     .catch(e => {
                         console.error('Error fetching user to edit', e);
                     });
@@ -271,6 +270,11 @@
             fetchPermissions () {
                 return fetch(`${this.server}/auth/permissions`)
                     .then(this.handleResponse)
+                    .then(permissions => {
+                        this.permissions.length = 0;
+                        this.permissions.push(...permissions);
+                        this.permissions.sort(permissionSort);
+                    })
                     .catch(e => {
                         console.error('Error fetching user to edit', e);
                     });
@@ -290,7 +294,7 @@
                     })
                     .then(responses =>  {
                         let event;
-                        if (this.userToEdit.id) {
+                        if (this.isEdit) {
                             event = new CustomEvent('user-edited.at', {detail: {user: this.userToEdit}})
                         } else {
                             event = new CustomEvent('user-created.at', {detail: {user: this.userToEdit}})
@@ -307,7 +311,7 @@
                 if (this.password) {
                     requestBody.password = this.password;
                 }
-                let url = this.userToEdit.id ? `${this.server}/auth/users/${this.userToEdit.id}` : `${this.server}/users`;
+                let url = this.userToEdit.id ? `${this.server}/auth/users/${this.userToEdit.id}` : `${this.server}/auth/users`;
                 let method = this.userToEdit.id ? 'PUT' : 'POST';
                 return fetch(url, {
                     method,
@@ -403,6 +407,12 @@
         components: {
         	Multiselect
         }
+    }
+    function groupSort (a, b) {
+        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+    }
+    function permissionSort (a, b) {
+        return a.alias.toLowerCase().localeCompare(b.alias.toLowerCase());
     }
 </script>
 

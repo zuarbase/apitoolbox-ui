@@ -1,7 +1,7 @@
 <template>
     <div class="group-view__wrapper container">
         <div class="row">
-            <div class="col-4 d-flex justify-content-end"">
+            <div class="col-4 d-flex justify-content-end">
                 <h3>{{group.name}}</h3>
             </div>
             <div class="col-8 d-flex justify-content-end"><button class="btn btn-primary" v-on:click="onEditClick">Edit</button></div>
