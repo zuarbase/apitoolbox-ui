@@ -162,6 +162,7 @@
                 <li><a href="#user-list">User List</a></li>
                 <li><a href="#subscribe-modal">Subscribe Modal</a></li>
                 <li><a href="#subscription-list">Subscription List</a></li>
+                <li><a href="#user-edit-modal">User Edit Modal</a></li>
             </ul>
         </nav>
 
@@ -203,6 +204,18 @@
                 <user-list
                     server="https://dev-analytics.zuarbase.net">
                 </user-list>
+            </div>
+        </div>
+
+        <div class="page" id="user-edit-modal">
+            <h2 class="widget-name">User Edit Modal</h2>
+            <div class="user-list__widget-wrapper">
+                <button onclick="document.querySelector('user-edit-modal').setAttribute('open-modal', false); setTimeout(() => {document.querySelector('user-edit-modal').setAttribute('open-modal', true)})">Show</button>
+                <user-edit-modal
+                    open-modal="false"
+                    user-id="1"
+                    server="https://dev-analytics.zuarbase.net">
+                </user-edit-modal>
             </div>
         </div>
 

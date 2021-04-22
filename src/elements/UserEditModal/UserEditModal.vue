@@ -16,6 +16,20 @@
                                             class="form needs-validation"
                                             novalidate
                                             ref="form">
+
+                                            <div class="form-group">
+                                                <label for="name">Full Name</label>
+                                                <input 
+                                                    type="text" 
+                                                    class="form-control" 
+                                                    id="name" 
+                                                    name="name" 
+                                                    placeholder="Name"
+                                                    ref="name"
+                                                    v-model="userToEdit.fullname"
+                                                    required />
+                                            </div>
+
                                             <div class="form-group">
                                                 <label for="username">Username</label>
                                                 <input 
@@ -30,18 +44,23 @@
                                                     required/>
                                                     <div class="invalid-feedback">Please provide a username</div>
                                             </div>
+
                                             <div class="form-group">
-                                                <label for="name">Full Name</label>
+                                                <label for="email">Password</label>
                                                 <input 
-                                                    type="text" 
-                                                    class="form-control" 
-                                                    id="name" 
-                                                    name="name" 
-                                                    placeholder="Name"
-                                                    ref="name"
-                                                    v-model="userToEdit.fullname"
-                                                    required />
+                				                    type="password" 
+                				                    class="form-control"
+                				                    id="password" 
+                                                    name="password" 
+                				                    placeholder="Password"
+                                                    autocomplete="new-password" 
+                				                    ref="password"
+                				                    v-model="password"
+                                                    minlength="6"
+                				                    :required="!userId">
+                                                    <div class="invalid-feedback">Password must be at least 6 characters in length</div>
                                             </div>
+
                                             <div class="form-group">
                                                 <label for="email">Email</label>
                                                 <input 
@@ -57,7 +76,7 @@
                                                     <div class="invalid-feedback">Please provide a valid email address</div>
                                             </div>
 
-                                            <div class="form-group">
+                                            <!-- <div class="form-group">
                                                 <label for="username"> 
                                                     <span v-if="userId">Reset Password (optional)</span>
                                                     <span v-if="!userId">Password</span>
@@ -84,9 +103,9 @@
                 				                    v-model="passwordConfirm"
                 				                    :required="!userId">
                 			                    <div class="invalid-feedback">Passwords must match</div>
-                				            </div>
+                				            </div> -->
 
-                				            <div class="form-group-row" v-if="isOpen">
+                				            <!-- <div class="form-group-row" v-if="isOpen">
                 					            <div class="form-group">
                                                     <label for="groups">Groups</label>
                 	                                <multiselect 
@@ -115,7 +134,7 @@
                                                         label="alias"
                 	                                	@tag="addPermission"></multiselect>
                 	                            </div>
-                                            </div>
+                                            </div> -->
 
                                             <div class="form-group">
                                                 <div class="form-check form-check-inline">
@@ -199,13 +218,13 @@
                 	this.selectedGroups.length = 0;
                 	this.selectedPermissions.length = 0;
                     
-                    this.fetchGroups();
-                    this.fetchPermissions();
+                    // this.fetchGroups();
+                    // this.fetchPermissions();
                     
                     if (this.userId) {
                         this.fetchUser();
-                        this.fetchUserGroups();
-                        this.fetchUserPermissions();
+                        // this.fetchUserGroups();
+                        // this.fetchUserPermissions();
                     }
 
                     this.open()
@@ -213,12 +232,12 @@
                     this.close()
                 }
             },
-            password: function (val) {
-            	this.checkPasswords()
-            },
-            passwordConfirm: function (val) {
-            	this.checkPasswords()
-            }
+            // password: function (val) {
+            // 	this.checkPasswords()
+            // },
+            // passwordConfirm: function (val) {
+            // 	this.checkPasswords()
+            // }
         },
         methods: {
             fetchUser () {
