@@ -88,112 +88,110 @@
 </template>
 
 <script>
-    import UserLogo from '../../assets/icon-user.svg'
-    export default {
-        name: 'LoginForm',
-        props: {
-            heading: String,
-            buttonText: String,
-            server: String
-        },
-        data () {
-            return {
-                authError: false,
-                form: {
-                    username: '',
-                    password: ''
-                },
-                showForgotPassword: false,
-                resetPasswordSuccess: false
-            }
-        },
-        methods: {
-            onSubmitClick () {
-                // Clear errors
-                this.authError = false
-
-                Object.keys(this.$refs).forEach(loc => {
-                    this.$refs[loc].classList.remove('error')
-                })
-
-                // Build request
-                // let params = new URLSearchParams()
-                // params.append('username', this.form.username)
-                // params.append('password', this.form.password)
-
-                // fetch(`${this.server}/resetpassword`, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     },
-                //     body: params,
-                //     redirect: 'manual'
-                // })
-                // .then(response => {
-                //     if (response.status === 401) {
-                //         this.authError = true
-                //     } else if (response.type === 'opaqueredirect') {
-                //         // Success
-                //         window.location.href = response.url
-                //     } else if (!response.ok) {
-                //         response.json().then(json => {
-                //             json.detail.forEach(error => {
-                //                 error.loc.forEach(loc => {
-                //                     if (this.$refs[loc]) {
-                //                         this.$refs[loc].classList.add('error')
-                //                     }
-                //                 })
-                //             })
-                //         })
-                //     }
-                // })
-                // .catch(response => {
-                //     console.debug('Error signing in or parsing response', response)
-                // })
+import UserLogo from '../../assets/icon-user.svg'
+export default {
+    name: 'LoginForm',
+    props: {
+        heading: String,
+        buttonText: String,
+        server: String
+    },
+    data () {
+        return {
+            authError: false,
+            form: {
+                username: '',
+                password: ''
             },
-            onSubmitForgotPasswordClick () {
-                // Build request
-                // let params = new URLSearchParams()
-                // params.append('username', this.form.forgotPasswordUsernameOrEmail)
-
-                // fetch(`${this.server}/login`, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/x-www-form-urlencoded'
-                //     },
-                //     body: params,
-                //     redirect: 'manual'
-                // })
-                // .then(response => {
-                //     if (response.status === 401) {
-                //         this.authError = true
-                //     } else if (response.type === 'opaqueredirect') {
-                //         // Success
-                //         window.location.href = response.url
-                //     } else if (!response.ok) {
-                //         response.json().then(json => {
-                //             json.detail.forEach(error => {
-                //                 error.loc.forEach(loc => {
-                //                     if (this.$refs[loc]) {
-                //                         this.$refs[loc].classList.add('error')
-                //                     }
-                //                 })
-                //             })
-                //         })
-                //     }
-                // })
-                // .catch(response => {
-                //     console.debug('Error signing in or parsing response', response)
-                // })
-
-                // Debug
-                this.resetPasswordSuccess = true
-            }
-        },
-        components: {
-            UserLogo
+            showForgotPassword: false,
+            resetPasswordSuccess: false
         }
+    },
+    methods: {
+        onSubmitClick () {
+            // Clear errors
+            this.authError = false
+
+            Object.keys(this.$refs).forEach(loc => {
+                this.$refs[loc].classList.remove('error')
+            })
+
+            const formData = new FormData();
+
+            // Vault support
+            const urlParams = new URLSearchParams(window.location.search);
+            const loc = urlParams.get('location');
+            if (loc) {
+                formData.append('location', loc);
+            }
+
+            formData.append('username', this.form.username);
+            formData.append('password', this.form.password);
+
+            fetch(`${this.server}/login`, {
+                method: 'POST',
+                body: formData,
+                redirect: 'manual'
+            })
+                .then(response => {
+                    if (response.status === 401) {
+                        this.authError = true
+                    } else if (response.type === 'opaqueredirect') {
+                        // Success
+                        window.location.href = response.url
+                    } else if (!response.ok) {
+                        response.json().then(json => {
+                            json.detail.forEach(error => {
+                                error.loc.forEach(loc => {
+                                    if (this.$refs[loc]) {
+                                        this.$refs[loc].classList.add('error')
+                                    }
+                                })
+                            })
+                        })
+                    }
+                })
+                .catch(response => {
+                    console.debug('Error signing in or parsing response', response)
+                })
+        },
+        onSubmitForgotPasswordClick () {
+            // Build request
+            const params = new URLSearchParams()
+            params.append('username', this.form.forgotPasswordUsernameOrEmail)
+
+            fetch(`${this.server}/resetpassword`, {
+                method: 'POST',
+                body: params,
+                redirect: 'manual'
+            })
+                .then(response => {
+                    if (response.status === 401) {
+                        this.authError = true
+                    } else if (response.type === 'opaqueredirect') {
+                        // Success
+                        window.location.href = response.url
+                    } else if (!response.ok) {
+                        response.json().then(json => {
+                            json.detail.forEach(error => {
+                                error.loc.forEach(loc => {
+                                    if (this.$refs[loc]) {
+                                        this.$refs[loc].classList.add('error')
+                                    }
+                                })
+                            })
+                        })
+                    }
+                })
+                .catch(response => {
+                    console.debug('Error signing in or parsing response', response)
+                })
+        }
+    },
+    components: {
+        UserLogo
     }
+}
 </script>
 
 <style lang="scss">
