@@ -169,16 +169,15 @@ export default {
 
             fetch(`${this.server}/login`, {
                 method: 'POST',
-                body: formData,
-                redirect: 'manual'
+                body: formData
             })
                 .then(response => {
                     if (response.status === 401) {
                         this.authError = true
-                    } else if (response.type === 'opaqueredirect') {
+                    } else if (response.ok) {
                         // Success
                         window.location.href = response.url
-                    } else if (!response.ok) {
+                    } else {
                         response.json().then(json => {
                             json.detail.forEach(error => {
                                 error.loc.forEach(loc => {
