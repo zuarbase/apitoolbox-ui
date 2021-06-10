@@ -1,13 +1,13 @@
 <template>
-    <div class="login-form__wrapper">
+    <div class="login-form__wrapper" :style="formStyle">
 
         <!-- Login -->
         <form
             class="form"
             v-on:submit.prevent="onSubmitClick"
             v-if="!showForgotPassword">
-            <div class="avatar">
-                <UserLogo />
+            <div class="logo" v-if="logo">
+                <img v-bind:src="logo" />
             </div>
             <h2 class="msg">{{heading}}</h2>
             <div class="form-group">
@@ -38,11 +38,12 @@
             <div class="form-group">
                 <button 
                     type="submit"
+                    :style="buttonStyle"
                     class="btn btn-primary btn-lg btn-block">{{buttonText}}</button>
             </div>
 
             <div class="form-group">
-                <a href v-on:click.prevent="showForgotPassword=true">Forgot password?</a>
+                <a href v-on:click.prevent="showForgotPassword=true" :style="linkSyle">Forgot password?</a>
             </div>
         </form>
 
@@ -51,8 +52,8 @@
             class="form"
             v-on:submit.prevent="onSubmitForgotPasswordClick"
             v-if="showForgotPassword">
-            <div class="avatar">
-                <UserLogo />
+            <div class="logo" v-if="logo">
+                <img v-bind:src="logo" />
             </div>
             <h2 class="msg">Reset Password</h2>
 
@@ -71,6 +72,7 @@
                 <div class="form-group">
                     <button 
                         type="submit"
+                        :style="buttonStyle"
                         class="btn btn-primary btn-lg btn-block">Send Email</button>
                 </div>
             </div>
@@ -81,20 +83,57 @@
             </div>
 
             <div class="form-group">
-                <a href v-on:click.prevent="resetPasswordSuccess=false; showForgotPassword=false">&laquo; Back</a>
+                <a href v-on:click.prevent="resetPasswordSuccess=false; showForgotPassword=false" :style="linkSyle">&laquo; Back</a>
             </div>
         </form>
     </div>
 </template>
 
 <script>
-import UserLogo from '../../assets/icon-user.svg'
 export default {
     name: 'LoginForm',
     props: {
-        heading: String,
-        buttonText: String,
+        heading: {
+            type: String,
+            default: 'Welcome'
+        },
+        logo: String,
+        bgColor: {
+            type: String,
+            default: 'gray'
+        },
+        textColor: {
+            type: String,
+            default: 'white'
+        },
+        buttonText: {
+            type: String,
+            default: 'Sign In'
+        },
+        buttonBgColor: {
+            type: String,
+            default: 'blue'
+        },
+        buttonTextColor: {
+            type: String,
+            default: 'white'
+        },
+        linkTextColor: {
+            type: String,
+            default: 'lightblue'
+        },
         server: String
+    },
+    computed: {
+        formStyle () {
+            return `background-color: ${this.bgColor}; color: ${this.textColor}`;
+        },
+        buttonStyle () {
+            return `background-color: ${this.buttonBgColor}; color: ${this.buttonTextColor}`
+        },
+        linkSyle () {
+            return `color: ${this.linkTextColor}`
+        }
     },
     data () {
         return {
@@ -130,16 +169,15 @@ export default {
 
             fetch(`${this.server}/login`, {
                 method: 'POST',
-                body: formData,
-                redirect: 'manual'
+                body: formData
             })
                 .then(response => {
                     if (response.status === 401) {
                         this.authError = true
-                    } else if (response.type === 'opaqueredirect') {
+                    } else if (response.ok) {
                         // Success
                         window.location.href = response.url
-                    } else if (!response.ok) {
+                    } else {
                         response.json().then(json => {
                             json.detail.forEach(error => {
                                 error.loc.forEach(loc => {
@@ -187,9 +225,6 @@ export default {
                     console.debug('Error signing in or parsing response', response)
                 })
         }
-    },
-    components: {
-        UserLogo
     }
 }
 </script>
@@ -200,16 +235,13 @@ export default {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-align: center;
-        color: #212529;
         width: 350px;
-        padding: 50px 0 0;
 
         *, ::after, ::before {
             box-sizing: border-box;
         }
 
         a {
-            color: #fa225b;
             text-decoration: none;
         }
         a:hover {
@@ -220,36 +252,20 @@ export default {
             color: #fa225b;
         }
 
-        .avatar {
-            position: absolute;
+        .logo {
             margin: 0 auto;
-            left: 0;
-            right: 0;
-            top: -50px;
-            width: 95px;
-            height: 95px;
-            border-radius: 50%;
-            background: #fa225b;
             padding: 15px;
-            box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.2);
-
-            svg {
-                width: 100%;
-                height: 100%;
-            }
         }
 
         .msg {
-            font-size: 22px;
-            margin: 35px 0 25px;
+            font-size: 14px;
+            margin: 0 0 26px;
         }
 
         .form {
             display: block;
-            color: #7a7a7a;
             border-radius: 2px;
             font-size: 13px;
-            background: #ececec;
             box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
             padding: 30px;
             position: relative;

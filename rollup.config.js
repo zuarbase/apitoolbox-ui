@@ -12,6 +12,7 @@ import vue from 'rollup-plugin-vue'
 
 const inputs = [
     'src/apitoolbox-ui.js',
+    'src/elements/BackgroundVisual/background-visual.js',
     'src/elements/GroupEditModal/group-edit-modal.js',
     'src/elements/GroupList/group-list.js',
     'src/elements/GroupView/group-view.js',
@@ -37,7 +38,7 @@ const plugins = [
     }),
     alias({
         entries: {
-            'vue': 'vue/dist/vue.runtime.esm.js'
+            vue: 'vue/dist/vue.runtime.esm.js'
         }
     }),
     resolve({
@@ -47,7 +48,7 @@ const plugins = [
     svg(),
     vue({
         compileTemplate: true
-    }),
+    })
     // uglify(),
     // gzip()
     // terser()
