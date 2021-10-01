@@ -1,8 +1,9 @@
 <template>
-    <div class="z-background-wrapper" v-if="src">
-        <div v-if="type==='image'" class="z-background-image" v-bind:style="{backgroundImage: 'url(' + src + ')'}" test-id="background-image"></div>
-        <video v-else class="z-background-video" autoplay muted loop test-id="background-video">
-            <source v-bind:src="src" type="video/mp4">
+    <div class="z-background-wrapper" v-if="source">
+        <div v-if="type==='image'" class="z-background-image" v-bind:style="{backgroundImage: 'url(' + source + ')'}" test-id="background-image"></div>
+        <div v-else-if="type==='color'" class="z-background-color" v-bind:style="{backgroundColor: source}" test-id="background-color"></div>
+        <video v-else-if="type==='video'" class="z-background-video" autoplay muted loop test-id="background-video">
+            <source v-bind:src="source" type="video/mp4">
         </video>
     </div>
 </template>
@@ -11,11 +12,30 @@
 export default {
     name: 'BackgroundVisual',
     props: {
-        src: String
+        src: String,
+        color: String,
+    },
+    data() {
+        return {
+            hexColorRegex: /^#.{6}$/g
+        }
     },
     computed: {
-        type () {
-            return this.src ? this.src.endsWith('.mp4') || this.src.endsWith('.mov') || this.src.endsWith('.webm') ? 'video' : 'image' : null;
+        source() {
+            return this.src || this.color || '';
+        },
+        type() {
+            if (this.source) {
+                if (this.source.endsWith('.mp4') || this.source.endsWith('.mov') || this.source.endsWith('.webm')) {
+                    return 'video';
+                } else if (this.hexColorRegex.test(this.source)){ 
+                    return 'color';
+                } else {
+                    return 'image';
+                }
+            } else {
+                return false;
+            }
         }
     }
 };
@@ -35,6 +55,10 @@ export default {
         height: 100%;
         position: relative;
         overflow: hidden;
+    }
+    .z-background-color {
+        width: 100%;
+        height: 100%;
     }
     .z-background-image {
         width: 100%;
