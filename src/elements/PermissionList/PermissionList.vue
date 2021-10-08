@@ -39,7 +39,7 @@
                 </table>
             </div>
         </div>
-        <permission-edit-modal 
+        <permission-edit-modal
             :server="server"
             :permission-id="permissionToEdit.id"
             :open-modal="openModal">
@@ -48,83 +48,83 @@
 </template>
 
 <script>
-    import PermissionEditModal from '../PermissionEditModal/PermissionEditModal.vue'
-    export default {
-        name: 'PermissionList',
-        props: {
-            server: String
-        },
-        data: () => {
-            return {
-                permissions: [],
-                loading:false,
-                openModal: false,
-                permissionToEdit: {}
-            }
-        },
-        created () {
-            this.loading = true;
-            fetch(`${this.server}/auth/permissions`)
-                .then( res =>res.json())
-                .then(permissions => {
-                    this.loading = false;
-                    this.permissions = permissions;
-                    this.permissions.sort(permissionSort);
-                })
-                .catch(err=>{
-                    this.loading = false;
-                    console.debug('Error retrieving permission list or parsing response', err)
-                })
-
-            document.addEventListener('permission-created.ft', (e, p) => {
-                this.permissions.push(e.detail.permission);
+import PermissionEditModal from '../PermissionEditModal/PermissionEditModal.vue'
+export default {
+    name: 'PermissionList',
+    props: {
+        server: String
+    },
+    data: () => {
+        return {
+            permissions: [],
+            loading: false,
+            openModal: false,
+            permissionToEdit: {}
+        }
+    },
+    created () {
+        this.loading = true;
+        fetch(`${this.server}/auth/permissions`)
+            .then( res => res.json())
+            .then(permissions => {
+                this.loading = false;
+                this.permissions = permissions;
                 this.permissions.sort(permissionSort);
             })
-
-            document.addEventListener('permission-edited.ft', (e, p) => {
-                Object.assign(this.permissions.find(permission => permission.id === e.detail.permission.id), e.detail.permission);
+            .catch(err => {
+                this.loading = false;
+                console.debug('Error retrieving permission list or parsing response', err)
             })
+
+        document.addEventListener('permission-created.ft', (e, p) => {
+            this.permissions.push(e.detail.permission);
+            this.permissions.sort(permissionSort);
+        })
+
+        document.addEventListener('permission-edited.ft', (e, p) => {
+            Object.assign(this.permissions.find(permission => permission.id === e.detail.permission.id), e.detail.permission);
+        })
+    },
+    methods: {
+        onAddPermissionClick () {
+            this.permissionToEdit = {};
+            this.openModal = false;
+            window.setTimeout(() => {
+                this.openModal = true;
+            });
         },
-        methods: {
-            onAddPermissionClick () {
-                this.permissionToEdit = {};
-                this.openModal = false;
-                window.setTimeout(() => {
-                    this.openModal = true;    
-                });
-            },
-            onEditClick (permission) {
-                this.permissionToEdit = permission;
-                this.openModal = false;
-                window.setTimeout(() => {
-                    this.openModal = true;    
-                });
-            },
-            onModalClose () {
-                this.openModal = false;
-            },
-            onDeleteClick (permission) {
-                fetch(`${this.server}/auth/permissions/${permission.id}`,{
-                    method:'DELETE'
+        onEditClick (permission) {
+            this.permissionToEdit = permission;
+            this.openModal = false;
+            window.setTimeout(() => {
+                this.openModal = true;
+            });
+        },
+        onModalClose () {
+            this.openModal = false;
+        },
+        onDeleteClick (permission) {
+            fetch(`${this.server}/auth/permissions/${permission.id}`, {
+                method: 'DELETE'
+            })
+                .then(permissions => {
+                    this.permissions = this.permissions.filter(perm => perm.id !== permission.id);
                 })
-                    .then(permissions => {
-                        this.permissions = this.permissions.filter(perm=>perm.id !== permission.id);
-                    })
-                    .catch(err => {
-                        this.loading = false;
-                        console.debug('Error removing permission or parsing response', err)
-                    })
-            }
-        },
-        components: {PermissionEditModal}
-    }
-    function permissionSort (a, b) {
-        return a.alias.toLowerCase().localeCompare(b.alias.toLowerCase());
-    }
+                .catch(err => {
+                    this.loading = false;
+                    console.debug('Error removing permission or parsing response', err)
+                })
+        }
+    },
+    components: { PermissionEditModal }
+}
+function permissionSort (a, b) {
+    return a.alias.toLowerCase().localeCompare(b.alias.toLowerCase());
+}
 </script>
 
 <style lang="scss">
-    
+
     .permission-list__wrapper {
         font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
         -webkit-font-smoothing: antialiased;
@@ -135,7 +135,7 @@
         *, ::after, ::before {
             box-sizing: border-box;
         }
-        
+
         .table {
             width: 100%;
             max-width: 100%;

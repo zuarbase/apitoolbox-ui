@@ -44,81 +44,81 @@
     </div>
 </template>
 <script>
-    import UserEditModal from '../UserEditModal/UserEditModal.vue'
-    export default {
-        name: 'UserList',
-        props: {
-            server: String
-        },
-        data: () => {
-            return {
-                users: [],
-                openModal: false,
-                userToEdit: {}
-            };
-        },
-        created () {
-            this.users.length = 0;
-            fetch(`${this.server}/auth/users`)
-                .then(this.handleResponse)
-                .then(json => {
-                    this.users.push(...json);
-                    this.users.sort(userSort);
-                    console.debug('users', this.users);
-                });
-
-            document.addEventListener('user-created.at', (e, p) => {
-                console.debug('user-created.ft', e);
-                this.users.push(e.detail.user);
+import UserEditModal from '../UserEditModal/UserEditModal.vue'
+export default {
+    name: 'UserList',
+    props: {
+        server: String
+    },
+    data: () => {
+        return {
+            users: [],
+            openModal: false,
+            userToEdit: {}
+        };
+    },
+    created () {
+        this.users.length = 0;
+        fetch(`${this.server}/auth/users`)
+            .then(this.handleResponse)
+            .then(json => {
+                this.users.push(...json);
                 this.users.sort(userSort);
+                console.debug('users', this.users);
             });
 
-            document.addEventListener('user-edited.at', (e, p) => {
-                console.debug('user-edited.ft', e);
-                Object.assign(this.users.find(user => user.id === e.detail.user.id), e.detail.user);
+        document.addEventListener('user-created.at', (e, p) => {
+            console.debug('user-created.ft', e);
+            this.users.push(e.detail.user);
+            this.users.sort(userSort);
+        });
+
+        document.addEventListener('user-edited.at', (e, p) => {
+            console.debug('user-edited.ft', e);
+            Object.assign(this.users.find(user => user.id === e.detail.user.id), e.detail.user);
+        });
+    },
+    methods: {
+        handleResponse (response) {
+            return response.json()
+                .then((json) => {
+                    if (!response.ok) {
+                        const error = Object.assign({}, json, {
+                            status: response.status,
+                            statusText: response.statusText,
+                        });
+
+                        return Promise.reject(error);
+                    }
+                    return json;
+                });
+        },
+        onAddClick () {
+            this.userToEdit = {
+                groups: [],
+                permissions: []
+            };
+            this.openModal = false;
+            window.setTimeout(() => {
+                this.openModal = true;    
             });
         },
-        methods: {
-            handleResponse (response) {
-                return response.json()
-                    .then((json) => {
-                        if (!response.ok) {
-                            const error = Object.assign({}, json, {
-                                status: response.status,
-                                statusText: response.statusText,
-                            });
-
-                            return Promise.reject(error);
-                        }
-                        return json;
-                    });
-            },
-            onAddClick () {
-                this.userToEdit = {
-                    groups: [],
-                    permissions: []
-                };
-                this.openModal = false;
-                window.setTimeout(() => {
-                    this.openModal = true;    
-                });
-            },
-            onEditClick (user) {
-                console.debug('edit click', user);
-                this.userToEdit = user;
-                this.openModal = false;
-                window.setTimeout(() => {
-                    this.openModal = true;
-                });
-            },
-            onViewClick (userId) {
-                let event = new CustomEvent('user-view.at', {detail: {userId}});
-                this.$el.parentNode.dispatchEvent(event);
-            },
-            onDeleteClick (user) {
-                fetch(`${this.server}/auth/users/${user.id}`,{
-                    method:'DELETE'
-                })
+        onEditClick (user) {
+            console.debug('edit click', user);
+            this.userToEdit = user;
+            this.openModal = false;
+            window.setTimeout(() => {
+                this.openModal = true;
+            });
+        },
+        onViewClick (userId) {
+            let event = new CustomEvent('user-view.at', {detail: {userId}});
+            this.$el.parentNode.dispatchEvent(event);
+        },
+        onDeleteClick (user) {
+            fetch(`${this.server}/auth/users/${user.id}`,{
+                method:'DELETE'
+            })
                 .then(() => {
                     this.users = this.users.filter(usr=>usr.id !== user.id);
                 })
@@ -126,17 +126,17 @@
                     this.loading = false;
                     console.debug('Error removing user or parsing response', err)
                 })
-            },
-            onModalClose () {
-                this.openModal = false;
-            }
         },
-        components: {UserEditModal}
-    }
+        onModalClose () {
+            this.openModal = false;
+        }
+    },
+    components: {UserEditModal}
+}
 
-    function userSort (a, b) {
-        return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
-    }
+function userSort (a, b) {
+    return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
+}
 </script>
 
 <style lang="scss">

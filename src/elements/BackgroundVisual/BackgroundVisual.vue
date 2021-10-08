@@ -13,22 +13,22 @@ export default {
     name: 'BackgroundVisual',
     props: {
         src: String,
-        color: String,
+        color: String
     },
-    data() {
+    data () {
         return {
             hexColorRegex: /^#.{6}$/g
         }
     },
     computed: {
-        source() {
+        source () {
             return this.src || this.color || '';
         },
-        type() {
+        type () {
             if (this.source) {
                 if (this.source.endsWith('.mp4') || this.source.endsWith('.mov') || this.source.endsWith('.webm')) {
                     return 'video';
-                } else if (this.hexColorRegex.test(this.source)){ 
+                } else if (this.hexColorRegex.test(this.source)) {
                     return 'color';
                 } else {
                     return 'image';

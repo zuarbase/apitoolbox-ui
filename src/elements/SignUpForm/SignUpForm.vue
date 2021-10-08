@@ -55,88 +55,88 @@
 </template>
 
 <script>
-    import { validationMixin } from 'vuelidate'
-    import { sameAs, required, minLength, email } from 'vuelidate/lib/validators'
-    export default {
-        name: 'SignUpForm',
-        props: {
-            heading: String,
-            buttonText: String,
-            server: String
+import { validationMixin } from 'vuelidate'
+import { sameAs, required, minLength, email } from 'vuelidate/lib/validators'
+export default {
+    name: 'SignUpForm',
+    props: {
+        heading: String,
+        buttonText: String,
+        server: String
+    },
+    data () {
+        return {
+            name: '',
+            email: '',
+            password: '',
+            passwordConfirm: ''
+        }
+    },
+    validations: {
+        name: {
+            required
         },
-        data () {
-            return {
-                name: '',
-                email: '',
-                password: '',
-                passwordConfirm: ''
-            }
+        email: {
+            email
         },
-        validations: {
-            name: {
-                required
-            },
-            email: {
-                email
-            },
-            password: {
-                required,
-                minLength: minLength(6)
-            },
-            passwordConfirm: {
-                required,
-                minLength: minLength(6),
-                sameAs: sameAs('password')
-            }
+        password: {
+            required,
+            minLength: minLength(6)
         },
-        methods: {
-            onSubmitClick () {
-                console.debug('Email is valid:', !this.$v.email.$error)
-                // Clear errors
-                // this.authError = false
+        passwordConfirm: {
+            required,
+            minLength: minLength(6),
+            sameAs: sameAs('password')
+        }
+    },
+    methods: {
+        onSubmitClick () {
+            console.debug('Email is valid:', !this.$v.email.$error)
+            // Clear errors
+            // this.authError = false
 
-                // Object.keys(this.$refs).forEach(loc => {
-                //     this.$refs[loc].classList.remove('error')
-                // })
+            // Object.keys(this.$refs).forEach(loc => {
+            //     this.$refs[loc].classList.remove('error')
+            // })
 
-                // // Build request
-                // let params = new URLSearchParams()
-                // params.append('username', this.form.username)
-                // params.append('password', this.form.password)
+            // // Build request
+            // let params = new URLSearchParams()
+            // params.append('username', this.form.username)
+            // params.append('password', this.form.password)
 
-                // fetch(`${this.server}/login`, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/x-www-form-urlencoded'
-                //     },
-                //     body: params,
-                //     redirect: 'manual'
-                // })
-                // .then(response => {
-                //     if (response.status === 401) {
-                //         this.authError = true
-                //     } else if (response.type === 'opaqueredirect') {
-                //         // Success
-                //         window.location.href = response.url
-                //     } else if (!response.ok) {
-                //         response.json().then(json => {
-                //             json.detail.forEach(error => {
-                //                 error.loc.forEach(loc => {
-                //                     if (this.$refs[loc]) {
-                //                         this.$refs[loc].classList.add('error')
-                //                     }
-                //                 })
-                //             })
-                //         })
-                //     }
-                // })
-                // .catch(response => {
-                //     console.debug('Error signing in or parsing response', response)
-                // })
-            }
-        },
-        mixins: [validationMixin]
-    }
+            // fetch(`${this.server}/login`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/x-www-form-urlencoded'
+            //     },
+            //     body: params,
+            //     redirect: 'manual'
+            // })
+            // .then(response => {
+            //     if (response.status === 401) {
+            //         this.authError = true
+            //     } else if (response.type === 'opaqueredirect') {
+            //         // Success
+            //         window.location.href = response.url
+            //     } else if (!response.ok) {
+            //         response.json().then(json => {
+            //             json.detail.forEach(error => {
+            //                 error.loc.forEach(loc => {
+            //                     if (this.$refs[loc]) {
+            //                         this.$refs[loc].classList.add('error')
+            //                     }
+            //                 })
+            //             })
+            //         })
+            //     }
+            // })
+            // .catch(response => {
+            //     console.debug('Error signing in or parsing response', response)
+            // })
+        }
+    },
+    mixins: [validationMixin]
+}
 </script>
 
 <style lang="scss">

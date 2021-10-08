@@ -146,111 +146,111 @@
 </template>
 
 <script>
-    import Vue from 'vue';
-    import VueTranslate from 'vue-translate-plugin';
-    Vue.use(VueTranslate);
-    export default {
-        name: 'SubscribeModal',
-        props: {
-            server: String,
-            openModal: Boolean, // Requested modal state
-            email: String, // Subscription Email
-            selectedDashboardId: String,
-            filters: String,
-            translations: String,
-            locale: String
-        },
-        data: () => {
-            return {
-                dashboards: [{name: 'All', id: 0}],
-                currentDashboard: {},
-                frequencies: ['DAILY', 'WEEKLY', 'MONTHLY'],
-                frequencySettingsWeekly: [{value: 0, label: 'MONDAY'}, {value: 1, label: 'TUESDAY'}, {value: 2, label: 'WEDNESDAY'}, {value: 3, label: 'THURSDAY'}, {value: 4, label: 'FRIDAY'}, {value: 5, label: 'SATURDAY'}, {value: 6, label: 'SUNDAY'}],
-                frequencySettingsMonthly: Array(31),
-                minutes: ['00', '15', '30', '45'],
-                hours: Array(12),
-                formState: {
-                    dashboard: null,
-                    frequency: '',
-                    dayOfWeek: null,
-                    dayOfMonth: null,
-                    hour: 8,
-                    minute: '',
-                    ampm: ''
-                },
-                disabled: false,
-                success: false,
-                error: false,
-                i18n: {},
-                isOpen: false // Actual modal state
-            };
-        },
-        watch: {
-            server: function (newServer, oldServer) {
-                if (newServer) {
-                    this.fetchDashboards();
-                }
+import Vue from 'vue';
+import VueTranslate from 'vue-translate-plugin';
+Vue.use(VueTranslate);
+export default {
+    name: 'SubscribeModal',
+    props: {
+        server: String,
+        openModal: Boolean, // Requested modal state
+        email: String, // Subscription Email
+        selectedDashboardId: String,
+        filters: String,
+        translations: String,
+        locale: String
+    },
+    data: () => {
+        return {
+            dashboards: [{ name: 'All', id: 0 }],
+            currentDashboard: {},
+            frequencies: ['DAILY', 'WEEKLY', 'MONTHLY'],
+            frequencySettingsWeekly: [{ value: 0, label: 'MONDAY' }, { value: 1, label: 'TUESDAY' }, { value: 2, label: 'WEDNESDAY' }, { value: 3, label: 'THURSDAY' }, { value: 4, label: 'FRIDAY' }, { value: 5, label: 'SATURDAY' }, { value: 6, label: 'SUNDAY' }],
+            frequencySettingsMonthly: Array(31),
+            minutes: ['00', '15', '30', '45'],
+            hours: Array(12),
+            formState: {
+                dashboard: null,
+                frequency: '',
+                dayOfWeek: null,
+                dayOfMonth: null,
+                hour: 8,
+                minute: '',
+                ampm: ''
             },
-            selectedDashboardId: function (newSelectedDashboardId) {
-                this.setSelectedDashboard(newSelectedDashboardId);
-            },
-            openModal: function (val) {
-            	if (val === this.isOpen) {
-            		// Already in requested state
-            		return;
-            	}
-                if (val) {
-                    this.open();
-
-                    if (!this.email) {
-                        this.error = 'No email found for user. Cannot create subscription.';
-                        this.disabled = true;
-                    }
-                } else {
-                    this.close();
-                    this.reset();
-                }
-            },
-            translations: function (val) {
-                if (this.translations && this.locale) {
-                    this.$translate.setLocales(JSON.parse(this.translations));
-                    this.$translate.setLang(this.locale);
-                }
-            },
-            locale: function (val) {
-                if (this.translations && this.locale) {
-                    this.$translate.setLocales(JSON.parse(this.translations));
-                    this.$translate.setLang(this.locale);
-                }
-            },
-            filters: function(val){
-                try {
-                    this.filtersObject = JSON.parse(val);
-                } catch (error) {
-                    this.filtersObject = false;
-                }
+            disabled: false,
+            success: false,
+            error: false,
+            i18n: {},
+            isOpen: false // Actual modal state
+        };
+    },
+    watch: {
+        server: function (newServer, oldServer) {
+            if (newServer) {
+                this.fetchDashboards();
             }
         },
-        mounted () {
+        selectedDashboardId: function (newSelectedDashboardId) {
+            this.setSelectedDashboard(newSelectedDashboardId);
+        },
+        openModal: function (val) {
+            if (val === this.isOpen) {
+                // Already in requested state
+                return;
+            }
+            if (val) {
+                this.open();
+
+                if (!this.email) {
+                    this.error = 'No email found for user. Cannot create subscription.';
+                    this.disabled = true;
+                }
+            } else {
+                this.close();
+                this.reset();
+            }
+        },
+        translations: function (val) {
             if (this.translations && this.locale) {
                 this.$translate.setLocales(JSON.parse(this.translations));
                 this.$translate.setLang(this.locale);
             }
         },
-        created () {
-            if (this.server) {
-                this.fetchDashboards();
+        locale: function (val) {
+            if (this.translations && this.locale) {
+                this.$translate.setLocales(JSON.parse(this.translations));
+                this.$translate.setLang(this.locale);
             }
-            this.reset();
         },
-        methods: {
-            fetchDashboards () {
-                fetch(`${this.server}/api/dashboards`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+        filters: function (val) {
+            try {
+                this.filtersObject = JSON.parse(val);
+            } catch (error) {
+                this.filtersObject = false;
+            }
+        }
+    },
+    mounted () {
+        if (this.translations && this.locale) {
+            this.$translate.setLocales(JSON.parse(this.translations));
+            this.$translate.setLang(this.locale);
+        }
+    },
+    created () {
+        if (this.server) {
+            this.fetchDashboards();
+        }
+        this.reset();
+    },
+    methods: {
+        fetchDashboards () {
+            fetch(`${this.server}/api/dashboards`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
                 .then(this.handleResponse)
                 .then(data => {
                     // Success
@@ -267,47 +267,47 @@
                     }
                    
                 });
-            },
-            setSelectedDashboard (dashboardId) {
-                console.debug('Setting selected dashboard');
-                if (dashboardId) {
-                    this.dashboards.forEach(dashboard => {
-                        if (dashboard.id === dashboardId) {
-                            this.formState.dashboard = dashboard;
-                            this.currentDashboard = dashboard; // In case user selects 'All'
-                            console.debug(' to: ', dashboard);
-                        }
-                    })
-                }
-            },
-            onCancelClick () {
-                this.close();
-                this.reset();
-            },
-            onSaveClick () {
-                this.disabled = true;
-                let subscription = {
-                    email: this.email,
-                    view_name: this.formState.dashboard.id != 0 ? this.getViewName(this.formState.dashboard.url) : this.getViewName(this.currentDashboard.url),
-                    schedule: this.formState.frequency, // daily, weekly, monthly
-                    day_of: this.formState.frequency === 'DAILY' ? 0 : this.formState.frequency === 'WEEKLY' ? this.formState.dayOfWeek : this.formState.dayOfMonth,
-                    send_at: this.getSendTime(), // "16:00 - 24-h format"
-                    tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    full: this.formState.dashboard.id === 0,
-                    json_data:{
-                        ...this.filtersObject
+        },
+        setSelectedDashboard (dashboardId) {
+            console.debug('Setting selected dashboard');
+            if (dashboardId) {
+                this.dashboards.forEach(dashboard => {
+                    if (dashboard.id === dashboardId) {
+                        this.formState.dashboard = dashboard;
+                        this.currentDashboard = dashboard; // In case user selects 'All'
+                        console.debug(' to: ', dashboard);
                     }
-                };
-                fetch(`${this.server}/auth/subscriptions`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(subscription)
                 })
+            }
+        },
+        onCancelClick () {
+            this.close();
+            this.reset();
+        },
+        onSaveClick () {
+            this.disabled = true;
+            let subscription = {
+                email: this.email,
+                view_name: this.formState.dashboard.id != 0 ? this.getViewName(this.formState.dashboard.url) : this.getViewName(this.currentDashboard.url),
+                schedule: this.formState.frequency, // daily, weekly, monthly
+                day_of: this.formState.frequency === 'DAILY' ? 0 : this.formState.frequency === 'WEEKLY' ? this.formState.dayOfWeek : this.formState.dayOfMonth,
+                send_at: this.getSendTime(), // "16:00 - 24-h format"
+                tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                full: this.formState.dashboard.id === 0,
+                json_data:{
+                    ...this.filtersObject
+                }
+            };
+            fetch(`${this.server}/auth/subscriptions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(subscription)
+            })
                 .then(this.handleResponse)
                 .then(json => {
-                    let event = new CustomEvent('subscription-created.ft', {detail:{subscription: json}});
+                    let event = new CustomEvent('subscription-created.ft', { detail:{ subscription: json } });
                     document.dispatchEvent(event);
                     this.success = true;
                     setTimeout(() => {
@@ -333,58 +333,58 @@
                     }
                    
                 });
-            },
-            getViewName (url) {
-                return url.split('/views/').pop().split('?')[0];
-            },
-            getSendTime () {
-                let hours = this.formState.ampm === 'pm' ? (this.formState.hour + 12) % 24 : this.formState.hour;
-                return `${hours}:${this.formState.minute}`
-            },
-            handleResponse (response) {
-                return response.json()
-                    .then((json) => {
-                        if (!response.ok) {
-                            const error = Object.assign({}, json, {
-                                status: response.status,
-                                statusText: response.statusText,
-                            });
+        },
+        getViewName (url) {
+            return url.split('/views/').pop().split('?')[0];
+        },
+        getSendTime () {
+            let hours = this.formState.ampm === 'pm' ? (this.formState.hour + 12) % 24 : this.formState.hour;
+            return `${hours}:${this.formState.minute}`
+        },
+        handleResponse (response) {
+            return response.json()
+                .then((json) => {
+                    if (!response.ok) {
+                        const error = Object.assign({}, json, {
+                            status: response.status,
+                            statusText: response.statusText,
+                        });
 
-                            return Promise.reject(error);
-                        }
-                        return json;
-                    });
-            },
-            open () {
-                document.body.appendChild(this.$refs.modalWrapper);
-                this.isOpen = true;
-            },
-            close () {
-                this.$refs.modalTemplate.appendChild(this.$refs.modalWrapper);
-                this.isOpen = false;
-                if (typeof this.onClose === 'function') {
+                        return Promise.reject(error);
+                    }
+                    return json;
+                });
+        },
+        open () {
+            document.body.appendChild(this.$refs.modalWrapper);
+            this.isOpen = true;
+        },
+        close () {
+            this.$refs.modalTemplate.appendChild(this.$refs.modalWrapper);
+            this.isOpen = false;
+            if (typeof this.onClose === 'function') {
                 	this.onClose();
-                }
-            },
-            reset () {
-                this.success = false;
-                this.disabled = false;
-                this.error = false;
-                this.formState.dashboard = this.dashboards[0];
-                this.formState.frequency = this.frequencies[0];
-                this.formState.dayOfWeek = this.frequencySettingsWeekly[0].value;
-                this.formState.dayOfMonth = 1;
-                this.formState.hour = 8;
-                this.formState.minute = this.minutes[0];
-                this.formState.ampm = 'am';
-            },
-            onBackdropClick (e) {
-                if (e.target === this.$refs.modalWrapper) {
-                    this.close();
-                }
+            }
+        },
+        reset () {
+            this.success = false;
+            this.disabled = false;
+            this.error = false;
+            this.formState.dashboard = this.dashboards[0];
+            this.formState.frequency = this.frequencies[0];
+            this.formState.dayOfWeek = this.frequencySettingsWeekly[0].value;
+            this.formState.dayOfMonth = 1;
+            this.formState.hour = 8;
+            this.formState.minute = this.minutes[0];
+            this.formState.ampm = 'am';
+        },
+        onBackdropClick (e) {
+            if (e.target === this.$refs.modalWrapper) {
+                this.close();
             }
         }
-    };
+    }
+};
 </script>
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

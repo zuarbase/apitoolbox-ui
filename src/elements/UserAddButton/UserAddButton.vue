@@ -6,36 +6,36 @@
 </template>
 
 <script>
-    import UserEditModal from '../UserEditModal/UserEditModal.vue'
-    export default {
-        name: 'UserAddButton',
-        props: {
-            server: String,
-            buttonText: String
-        },
-        data: () => {
-            return {
-                user: {
-                    groups: [],
-                    permissions: []
-                },
-                openModal: false
-            }
-        },
-        methods: {
-            onAddUserClick () {
-                this.openModal = false;
-                window.setTimeout(() => {
-                    this.openModal = true;
-                });
+import UserEditModal from '../UserEditModal/UserEditModal.vue'
+export default {
+    name: 'UserAddButton',
+    props: {
+        server: String,
+        buttonText: String
+    },
+    data: () => {
+        return {
+            user: {
+                groups: [],
+                permissions: []
             },
-            onModalClose () {
-                console.debug('modal close callback')
-                this.openModal = false
-            }
+            openModal: false
+        }
+    },
+    methods: {
+        onAddUserClick () {
+            this.openModal = false;
+            window.setTimeout(() => {
+                this.openModal = true;
+            });
         },
-        components: {UserEditModal}
-    }
+        onModalClose () {
+            console.debug('modal close callback')
+            this.openModal = false
+        }
+    },
+    components: {UserEditModal}
+}
 </script>
 
 <style scoped lang="scss">
