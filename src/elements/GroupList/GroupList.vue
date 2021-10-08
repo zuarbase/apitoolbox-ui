@@ -47,86 +47,85 @@
 </template>
 
 <script>
-    import GroupEditModal from '../GroupEditModal/GroupEditModal.vue'
-    export default {
-        name: 'GroupList',
-        props: {
-            server: String
+import GroupEditModal from '../GroupEditModal/GroupEditModal.vue'
+export default {
+    name: 'GroupList',
+    props: {
+        server: String
+    },
+    data: () => {
+        return {
+            groups: [],
+            loading: false,
+            openModal: false,
+            groupToEdit: {}
+        }
+    },
+    created () {
+        this.loading = true;
+        fetch(`${this.server}/auth/groups`)
+            .then(res => res.json())
+            .then(groups => {
+                this.loading = false;
+                this.groups = groups.sort(groupSort);
+            })
+            .catch(err => {
+                this.loading = false;
+                console.debug('Error retrieving group list or parsing response', err)
+            });
+
+        document.addEventListener('group-created.at', (e, p) => {
+            this.groups.push(e.detail.group);
+            this.groups.sort(groupSort);
+        });
+
+        document.addEventListener('group-edited.at', (e, p) => {
+            Object.assign(this.groups.find(group => group.id === e.detail.group.id), e.detail.group);
+        });
+    },
+    methods: {
+        onAddGroupClick () {
+            this.groupToEdit = {};
+            this.openModal = false;
+            window.setTimeout(() => {
+                this.openModal = true;
+            });
         },
-        data: () => {
-            return {
-                groups: [],
-                loading:false,
-                openModal: false,
-                groupToEdit: {}
-            }
+        onViewClick (group) {
+            const event = new CustomEvent('group-view.at', { detail: { group: group } });
+            this.$el.parentNode.dispatchEvent(event);
         },
-        created () {
-            this.loading = true;
-            fetch(`${this.server}/auth/groups`)
-                .then( res =>res.json())
+        onEditClick (group) {
+            this.groupToEdit = group;
+            this.openModal = false;
+            window.setTimeout(() => {
+                this.openModal = true;
+            });
+        },
+        onModalClose () {
+            this.openModal = false;
+        },
+        onDeleteClick (group) {
+            fetch(`${this.server}/auth/groups/${group.id}`,{
+                method: 'DELETE'
+            })
                 .then(groups => {
-                    this.loading = false;
-                    this.groups = groups.sort(groupSort);
+                    this.groups = this.groups.filter(grp => grp.id !== group.id);
                 })
-                .catch(err=>{
+                .catch(err => {
                     this.loading = false;
-                    console.debug('Error retrieving group list or parsing response', err)
-                });
-
-            document.addEventListener('group-created.at', (e, p) => {
-                this.groups.push(e.detail.group);
-                this.groups.sort(groupSort);
-            });
-
-            document.addEventListener('group-edited.at', (e, p) => {
-                Object.assign(this.groups.find(group => group.id === e.detail.group.id), e.detail.group);
-            });
-        },
-        methods: {
-            onAddGroupClick () {
-                this.groupToEdit = {};
-                this.openModal = false;
-                window.setTimeout(() => {
-                    this.openModal = true;    
-                });
-            },
-            onViewClick (group) {
-                let event = new CustomEvent('group-view.at', {detail: {group: group}});
-                this.$el.parentNode.dispatchEvent(event);
-            },
-            onEditClick (group) {
-                this.groupToEdit = group;
-                this.openModal = false;
-                window.setTimeout(() => {
-                    this.openModal = true;    
-                });
-            },
-            onModalClose () {
-                this.openModal = false;
-            },
-            onDeleteClick (group) {
-                fetch(`${this.server}/auth/groups/${group.id}`,{
-                    method:'DELETE'
+                    console.debug('Error removing group or parsing response', err)
                 })
-                    .then(groups => {
-                        this.groups = this.groups.filter(grp=>grp.id !== group.id);
-                    })
-                    .catch(err => {
-                        this.loading = false;
-                        console.debug('Error removing group or parsing response', err)
-                    })
-            }
-        },
-        components: {GroupEditModal}
-    }
-    function groupSort (a, b) {
-        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-    }
+        }
+    },
+    components: { GroupEditModal }
+}
+function groupSort (a, b) {
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+}
 </script>
 
 <style lang="scss">
-    
     .group-list__wrapper {
         font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
         -webkit-font-smoothing: antialiased;
@@ -137,7 +136,6 @@
         *, ::after, ::before {
             box-sizing: border-box;
         }
-        
         .table {
             width: 100%;
             max-width: 100%;
@@ -155,7 +153,6 @@
             vertical-align: top;
             border-top: 1px solid #dee2e6;
         }
-
         .table td:last-of-type{
             white-space: nowrap;
         }
@@ -164,7 +161,6 @@
             font-size: .8rem;
             font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;
         }
-
         .btn {
             border-radius: 2px;
             padding: .5rem 1rem;

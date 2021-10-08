@@ -64,7 +64,7 @@
 
 <script>
 export default {
-    name: "PermissionEditModal",
+    name: 'PermissionEditModal',
     props: {
         server: {
             type: String,
@@ -80,7 +80,7 @@ export default {
         };
     },
     watch: {
-        openModal: function(val) {
+        openModal: function (val) {
             if (val === this.isOpen) {
                 // Already in requested state
                 return;
@@ -103,10 +103,10 @@ export default {
         }
     },
     methods: {
-        onCancelClick() {
+        onCancelClick () {
             this.close();
         },
-        onSaveClick() {
+        onSaveClick () {
             if (this.$refs.form.checkValidity() === false) {
                 this.$refs.form.classList.add('was-validated');
                 return;
@@ -114,33 +114,33 @@ export default {
             let request;
             if (this.permissionId) {
                 request = fetch(`${this.server}/auth/permissions/${this.permissionId}`, {
-                    method: "PUT",
+                    method: 'PUT',
                     headers: {
-                        "Content-Type": "application/json"
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(this.permissionToEdit)
                 });
             } else {
                 request = fetch(`${this.server}/auth/permissions`, {
-                    method: "POST",
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json"
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(this.permissionToEdit)
                 });
             }
             request
                 .then(this.handleResponse)
-                .then(permission=>{
+                .then(permission => {
                     let event;
                     if (this.permissionToEdit.id) {
-                        event = new CustomEvent('permission-edited.ft', {detail: {permission}})
+                        event = new CustomEvent('permission-edited.ft', { detail: { permission } })
                     } else {
-                        event = new CustomEvent('permission-created.ft', {detail: {permission}})
+                        event = new CustomEvent('permission-created.ft', { detail: { permission } })
                     }
                     document.dispatchEvent(event);
                 })
-                .catch(err=>{
+                .catch(err => {
                     console.debug('Error creating permission or parsing response', err)
                 })
             this.close();
@@ -169,9 +169,8 @@ export default {
         open () {
             document.body.appendChild(this.$refs.modalWrapper);
             window.setTimeout(() => {
-                this.$refs.modal.classList.add('show');    
+                this.$refs.modal.classList.add('show');
             }, 100);
-            
             this.isOpen = true;
         },
         close () {

@@ -41,115 +41,115 @@
 </template>
 
 <script>
-    import Vue from 'vue';
-    import VueTranslate from 'vue-translate-plugin';
-    Vue.use(VueTranslate);
-    export default {
-        name: 'SubscriptionList',
-        props: {
-            server: String,
-            translations: String,
-            locale: String
-        },
-        data: () => {
-            return {
-                subscriptions: [],
-                openedSubscription:'',
-                openModal: false,
-                userToEdit: {}
+import Vue from 'vue';
+import VueTranslate from 'vue-translate-plugin';
+Vue.use(VueTranslate);
+export default {
+    name: 'SubscriptionList',
+    props: {
+        server: String,
+        translations: String,
+        locale: String
+    },
+    data: () => {
+        return {
+            subscriptions: [],
+            openedSubscription:'',
+            openModal: false,
+            userToEdit: {}
+        }
+    },
+    created () {
+        this.fetchSubscriptions();
+
+        document.addEventListener('subscription-created.ft', (e, p) => {
+            this.subscriptions.push(e.detail.subscription);
+        })
+
+        document.addEventListener('subscription-edited.ft', (e, p) => {
+            Object.assign(this.subscriptions.find(subscription => subscription.id === e.detail.subscription.id), 
+                e.detail.subscription);
+        })
+    },
+    methods: {
+        toggle(subscription){
+            if(this.openedSubscription === subscription.id) {
+                this.openedSubscription = '';
+            } else {
+                this.openedSubscription = subscription.id;
             }
         },
-        created () {
-            this.fetchSubscriptions();
-
-            document.addEventListener('subscription-created.ft', (e, p) => {
-                this.subscriptions.push(e.detail.subscription);
-            })
-
-            document.addEventListener('subscription-edited.ft', (e, p) => {
-                Object.assign(this.subscriptions.find(subscription => subscription.id === e.detail.subscription.id), 
-                    e.detail.subscription);
-            })
+        fetchSubscriptions () {
+            if (!this.server) {
+                return;
+            }
+            fetch(`${this.server}/auth/subscriptions`)
+                .then(this.handleResponse)
+                .then(json => {
+                    this.subscriptions.push(...json);
+                });
         },
-        methods: {
-            toggle(subscription){
-                if(this.openedSubscription === subscription.id) {
-                    this.openedSubscription = '';
-                } else {
-                    this.openedSubscription = subscription.id;
-                }
-            },
-            fetchSubscriptions () {
-                if (!this.server) {
-                    return;
-                }
-                fetch(`${this.server}/auth/subscriptions`)
-                    .then(this.handleResponse)
-                    .then(json => {
-                        this.subscriptions.push(...json);
-                    });
-            },
-            // onEditClick (subscription) {
-            //     console.debug('subscription edit click', subscription);
-            //     this.subscriptionToEdit = subscription;
-            //     this.openModal = true;
-            // },
-            onDeleteClick (subscription) {
-                fetch(`${this.server}/auth/subscriptions/${subscription.id}`, {
-                    method: 'DELETE'
-                })
-                    .then(this.handleResponse)
-                    .then(deletedSubscription => {
-                        let i = this.subscriptions.length - 1;
-                        while (i >= 0) {
-                            if (this.subscriptions[i].id === deletedSubscription.id) {
-                                this.subscriptions.splice(i, 1);
-                            }
-                            i--;
+        // onEditClick (subscription) {
+        //     console.debug('subscription edit click', subscription);
+        //     this.subscriptionToEdit = subscription;
+        //     this.openModal = true;
+        // },
+        onDeleteClick (subscription) {
+            fetch(`${this.server}/auth/subscriptions/${subscription.id}`, {
+                method: 'DELETE'
+            })
+                .then(this.handleResponse)
+                .then(deletedSubscription => {
+                    let i = this.subscriptions.length - 1;
+                    while (i >= 0) {
+                        if (this.subscriptions[i].id === deletedSubscription.id) {
+                            this.subscriptions.splice(i, 1);
                         }
-                    });
-            },
-            handleResponse (response) {
-                return response.json()
-                    .then((json) => {
-                        if (!response.ok) {
-                            const error = Object.assign({}, json, {
-                                status: response.status,
-                                statusText: response.statusText,
-                            });
+                        i--;
+                    }
+                });
+        },
+        handleResponse (response) {
+            return response.json()
+                .then((json) => {
+                    if (!response.ok) {
+                        const error = Object.assign({}, json, {
+                            status: response.status,
+                            statusText: response.statusText,
+                        });
 
-                            return Promise.reject(error);
-                        }
-                        return json;
-                    });
-            },
-            onModalClose () {
-                this.openModal = false
-            },
-            isSubscriptionHasFilters(sub){
-                return Object.keys(sub.json_data).length !== 0;
+                        return Promise.reject(error);
+                    }
+                    return json;
+                });
+        },
+        onModalClose () {
+            this.openModal = false
+        },
+        isSubscriptionHasFilters(sub){
+            return Object.keys(sub.json_data).length !== 0;
+        }
+    },
+    watch: {
+        server: function (newServer, oldServer) {
+            if (newServer) {
+                this.fetchSubscriptions();
             }
         },
-        watch: {
-            server: function (newServer, oldServer) {
-                if (newServer) {
-                    this.fetchSubscriptions();
-                }
-            },
-            translations: function (val) {
-                if (this.translations && this.locale) {
-                    this.$translate.setLocales(JSON.parse(this.translations));
-                    this.$translate.setLang(this.locale);
-                }
-            },
-            locale: function (val) {
-                if (this.translations && this.locale) {
-                    this.$translate.setLocales(JSON.parse(this.translations));
-                    this.$translate.setLang(this.locale);
-                }
+        translations: function (val) {
+            if (this.translations && this.locale) {
+                this.$translate.setLocales(JSON.parse(this.translations));
+                this.$translate.setLang(this.locale);
+            }
+        },
+        locale: function (val) {
+            if (this.translations && this.locale) {
+                this.$translate.setLocales(JSON.parse(this.translations));
+                this.$translate.setLang(this.locale);
             }
         }
     }
+}
 </script>
 
 <style lang="scss">

@@ -173,266 +173,266 @@
 </template>
 
 <script>
-	import Multiselect from 'vue-multiselect';
-    export default {
-        name: 'UserEditModal',
-        props: {
-            server: {
-                type: String,
-                default: ''
-            },
-            openModal: Boolean, // Requested modal state
-            userId: String
+import Multiselect from 'vue-multiselect';
+export default {
+    name: 'UserEditModal',
+    props: {
+        server: {
+            type: String,
+            default: ''
         },
-        data: () => {
-            return {
-                isEdit: false,
-                userToEdit: {},
-                password: '', // Password change model
-                passwordConfirm: '',
-                passwordMatchError: false,
-                passwordLengthError: false,
-                groups: ['Administrator', 'Editor', 'User'],
-                selectedGroups: [], // Groups tag component model
-                permissions: [],
-                selectedPermissions: [], // Permissions tag component model
-                isOpen: false, // Actual modal state
-                error: null // {status, statusText, detail}
-            }
-        },
-        watch: {
-            openModal: function (val) {
+        openModal: Boolean, // Requested modal state
+        userId: String
+    },
+    data: () => {
+        return {
+            isEdit: false,
+            userToEdit: {},
+            password: '', // Password change model
+            passwordConfirm: '',
+            passwordMatchError: false,
+            passwordLengthError: false,
+            groups: ['Administrator', 'Editor', 'User'],
+            selectedGroups: [], // Groups tag component model
+            permissions: [],
+            selectedPermissions: [], // Permissions tag component model
+            isOpen: false, // Actual modal state
+            error: null // {status, statusText, detail}
+        }
+    },
+    watch: {
+        openModal: function (val) {
             	if (val === this.isOpen) {
             		// Already in requested state
             		return;
             	}
-                if (val) {
-                    this.isEdit = !!this.userId;
-                    this.userToEdit = {};
-                    this.password = '';
-                    this.passwordConfirm = '';
-                    this.error = null;
-                    this.$refs.form.classList.remove('was-validated');
-                    this.server = this.server || '';
+            if (val) {
+                this.isEdit = !!this.userId;
+                this.userToEdit = {};
+                this.password = '';
+                this.passwordConfirm = '';
+                this.error = null;
+                this.$refs.form.classList.remove('was-validated');
+                this.server = this.server || '';
 
                 	this.selectedGroups.length = 0;
                 	this.selectedPermissions.length = 0;
                     
-                    // this.fetchGroups();
-                    // this.fetchPermissions();
+                // this.fetchGroups();
+                // this.fetchPermissions();
                     
-                    if (this.userId) {
-                        this.fetchUser();
-                        // this.fetchUserGroups();
-                        // this.fetchUserPermissions();
-                    }
+                if (this.userId) {
+                    this.fetchUser();
+                    // this.fetchUserGroups();
+                    // this.fetchUserPermissions();
+                }
 
-                    this.open()
-                } else {
-                    this.close()
-                }
-            },
-            // password: function (val) {
-            // 	this.checkPasswords()
-            // },
-            // passwordConfirm: function (val) {
-            // 	this.checkPasswords()
-            // }
-        },
-        methods: {
-            fetchUser () {
-                return fetch(`${this.server}/auth/users/${this.userId}`)
-                    .then(this.handleResponse)
-                    .then(user => {
-                        this.userToEdit = {};
-                        Object.assign(this.userToEdit, user);
-                    })
-                    .catch(e => {
-                        console.error('Error fetching user to edit', e);
-                    });
-            },
-            fetchUserGroups () {
-                return fetch(`${this.server}/auth/users/${this.userId}/groups`)
-                    .then(this.handleResponse)
-                    .then(groups => {
-                        console.debug('selected groups', groups);
-                        this.selectedGroups.length = 0;
-                        this.selectedGroups.push(...groups);
-                    })
-                    .catch(e => {
-                        console.error('Error fetching user groups', e);
-                    });
-            },
-            fetchUserPermissions () {
-                return fetch(`${this.server}/auth/users/${this.userId}/permissions`)
-                    .then(this.handleResponse)
-                    .then(permissions => {
-                        this.selectedPermissions.length = 0;
-                        this.selectedPermissions.push(...permissions);
-                    })
-                    .catch(e => {
-                        console.error('Error fetching user to edit', e);
-                    });
-            },
-            fetchGroups () {
-                return fetch(`${this.server}/auth/groups`)
-                    .then(this.handleResponse)
-                    .then(groups => {
-                        this.groups.length = 0;
-                        this.groups.push(...groups);
-                        this.groups.sort(groupSort);
-                    })
-                    .catch(e => {
-                        console.error('Error fetching user to edit', e);
-                    });
-            },
-            fetchPermissions () {
-                return fetch(`${this.server}/auth/permissions`)
-                    .then(this.handleResponse)
-                    .then(permissions => {
-                        this.permissions.length = 0;
-                        this.permissions.push(...permissions);
-                        this.permissions.sort(permissionSort);
-                    })
-                    .catch(e => {
-                        console.error('Error fetching user to edit', e);
-                    });
-            },
-            onCancelClick () {
+                this.open()
+            } else {
                 this.close()
-            },
-            onSaveClick () {
-                if (this.$refs.form.checkValidity() === false) {
-                    this.$refs.form.classList.add('was-validated');
-                    return;
-                }
-                this.saveUser()
-                    .then(user => {
-                        this.userToEdit.id = user.id;
-                        return Promise.all([this.saveUserGroups(), this.saveUserPermissions()]);
-                    })
-                    .then(responses =>  {
-                        let event;
-                        if (this.isEdit) {
-                            event = new CustomEvent('user-edited.at', {detail: {user: this.userToEdit}})
-                        } else {
-                            event = new CustomEvent('user-created.at', {detail: {user: this.userToEdit}})
-                        }
-                        document.dispatchEvent(event);
-                        this.close();
-                    })
-                    .catch(response => {
-                        console.error('Error saving user', response);
-                    });
-            },
-            saveUser () {
-                let requestBody = Object.assign({}, this.userToEdit);
-                if (this.password) {
-                    requestBody.password = this.password;
-                }
-                let url = this.userToEdit.id ? `${this.server}/auth/users/${this.userToEdit.id}` : `${this.server}/auth/users`;
-                let method = this.userToEdit.id ? 'PUT' : 'POST';
-                return fetch(url, {
-                    method,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody)
-                })
-                .then(this.handleResponse);
-            },
-            saveUserGroups () {
-                let requestBody = {groups: this.selectedGroups.map(grp => grp.id)};
-                return fetch(`${this.server}/auth/users/${this.userToEdit.id}/groups`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody)
-                })
-                .then(this.handleResponse);
-            },
-            saveUserPermissions () {
-                let requestBody = {permissions: this.selectedPermissions.map(grp => grp.id)};
-                return fetch(`${this.server}/auth/users/${this.userToEdit.id}/permissions`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody)
-                })
-                .then(this.handleResponse);
-            },
-            addGroup (newGroup) {
-      			this.user.groups.push(newGroup)
-      			this.groups.push(newGroup)
-			},
-			addPermission (newPermission) {
-      			this.user.permissions.push(newPermission)
-      			this.permissions.push(newPermission)
-			},
-			checkPasswords (required) {
-				this.$refs.password.classList.remove('error')
-				this.$refs.passwordConfirm.classList.remove('error')
-				this.passwordLengthError = false
-				this.passwordMatchError = false
-				if (this.password.length && this.passwordConfirm.length) {
-                    this.$refs.password.setCustomValidity('');
-                    this.$refs.passwordConfirm.setCustomValidity('');
-					if (this.password.length < 6) {
-						// this.$refs.password.classList.add('error')
-						// this.passwordLengthError = true
-                        this.$refs.password.setCustomValidity('Password must be at least 6 characters long.');
-					}
-					if (this.passwordConfirm.length < 6) {
-						this.$refs.passwordConfirm.setCustomValidity('Password must be at least 6 characters long.');
-					}
-					if (this.passwordConfirm !== this.password) {
-						this.$refs.passwordConfirm.setCustomValidity('Password must be at least 6 characters long.');
-					}
-				}
-			},
-            handleResponse (response) {
-                return response.json()
-                    .then((json) => {
-                        if (!response.ok) {
-                            const error = Object.assign({}, json, {
-                                status: response.status,
-                                statusText: response.statusText,
-                                detail: response.detail
-                            });
-                            this.error = error;
-                            return Promise.reject(error);
-                        }
-                        return json;
-                    });
-            },
-            open () {
-                document.body.appendChild(this.$refs.modalWrapper);
-                window.setTimeout(() => {
-                    this.$refs.modal.classList.add('show');    
-                }, 100);
-                
-                this.isOpen = true;
-            },
-            close () {
-                this.$refs.modal.classList.remove('show');
-                window.setTimeout(() => {
-                    this.$refs.modalTemplate.appendChild(this.$refs.modalWrapper);
-                }, 300);
-                this.isOpen = false;
             }
         },
-        components: {
-        	Multiselect
+        // password: function (val) {
+        // 	this.checkPasswords()
+        // },
+        // passwordConfirm: function (val) {
+        // 	this.checkPasswords()
+        // }
+    },
+    methods: {
+        fetchUser () {
+            return fetch(`${this.server}/auth/users/${this.userId}`)
+                .then(this.handleResponse)
+                .then(user => {
+                    this.userToEdit = {};
+                    Object.assign(this.userToEdit, user);
+                })
+                .catch(e => {
+                    console.error('Error fetching user to edit', e);
+                });
+        },
+        fetchUserGroups () {
+            return fetch(`${this.server}/auth/users/${this.userId}/groups`)
+                .then(this.handleResponse)
+                .then(groups => {
+                    console.debug('selected groups', groups);
+                    this.selectedGroups.length = 0;
+                    this.selectedGroups.push(...groups);
+                })
+                .catch(e => {
+                    console.error('Error fetching user groups', e);
+                });
+        },
+        fetchUserPermissions () {
+            return fetch(`${this.server}/auth/users/${this.userId}/permissions`)
+                .then(this.handleResponse)
+                .then(permissions => {
+                    this.selectedPermissions.length = 0;
+                    this.selectedPermissions.push(...permissions);
+                })
+                .catch(e => {
+                    console.error('Error fetching user to edit', e);
+                });
+        },
+        fetchGroups () {
+            return fetch(`${this.server}/auth/groups`)
+                .then(this.handleResponse)
+                .then(groups => {
+                    this.groups.length = 0;
+                    this.groups.push(...groups);
+                    this.groups.sort(groupSort);
+                })
+                .catch(e => {
+                    console.error('Error fetching user to edit', e);
+                });
+        },
+        fetchPermissions () {
+            return fetch(`${this.server}/auth/permissions`)
+                .then(this.handleResponse)
+                .then(permissions => {
+                    this.permissions.length = 0;
+                    this.permissions.push(...permissions);
+                    this.permissions.sort(permissionSort);
+                })
+                .catch(e => {
+                    console.error('Error fetching user to edit', e);
+                });
+        },
+        onCancelClick () {
+            this.close()
+        },
+        onSaveClick () {
+            if (this.$refs.form.checkValidity() === false) {
+                this.$refs.form.classList.add('was-validated');
+                return;
+            }
+            this.saveUser()
+                .then(user => {
+                    this.userToEdit.id = user.id;
+                    return Promise.all([this.saveUserGroups(), this.saveUserPermissions()]);
+                })
+                .then(responses =>  {
+                    let event;
+                    if (this.isEdit) {
+                        event = new CustomEvent('user-edited.at', {detail: {user: this.userToEdit}})
+                    } else {
+                        event = new CustomEvent('user-created.at', {detail: {user: this.userToEdit}})
+                    }
+                    document.dispatchEvent(event);
+                    this.close();
+                })
+                .catch(response => {
+                    console.error('Error saving user', response);
+                });
+        },
+        saveUser () {
+            let requestBody = Object.assign({}, this.userToEdit);
+            if (this.password) {
+                requestBody.password = this.password;
+            }
+            let url = this.userToEdit.id ? `${this.server}/auth/users/${this.userToEdit.id}` : `${this.server}/auth/users`;
+            let method = this.userToEdit.id ? 'PUT' : 'POST';
+            return fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            })
+                .then(this.handleResponse);
+        },
+        saveUserGroups () {
+            let requestBody = {groups: this.selectedGroups.map(grp => grp.id)};
+            return fetch(`${this.server}/auth/users/${this.userToEdit.id}/groups`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            })
+                .then(this.handleResponse);
+        },
+        saveUserPermissions () {
+            let requestBody = {permissions: this.selectedPermissions.map(grp => grp.id)};
+            return fetch(`${this.server}/auth/users/${this.userToEdit.id}/permissions`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            })
+                .then(this.handleResponse);
+        },
+        addGroup (newGroup) {
+      			this.user.groups.push(newGroup)
+      			this.groups.push(newGroup)
+        },
+        addPermission (newPermission) {
+      			this.user.permissions.push(newPermission)
+      			this.permissions.push(newPermission)
+        },
+        checkPasswords (required) {
+            this.$refs.password.classList.remove('error')
+            this.$refs.passwordConfirm.classList.remove('error')
+            this.passwordLengthError = false
+            this.passwordMatchError = false
+            if (this.password.length && this.passwordConfirm.length) {
+                this.$refs.password.setCustomValidity('');
+                this.$refs.passwordConfirm.setCustomValidity('');
+                if (this.password.length < 6) {
+                    // this.$refs.password.classList.add('error')
+                    // this.passwordLengthError = true
+                    this.$refs.password.setCustomValidity('Password must be at least 6 characters long.');
+                }
+                if (this.passwordConfirm.length < 6) {
+                    this.$refs.passwordConfirm.setCustomValidity('Password must be at least 6 characters long.');
+                }
+                if (this.passwordConfirm !== this.password) {
+                    this.$refs.passwordConfirm.setCustomValidity('Password must be at least 6 characters long.');
+                }
+            }
+        },
+        handleResponse (response) {
+            return response.json()
+                .then((json) => {
+                    if (!response.ok) {
+                        const error = Object.assign({}, json, {
+                            status: response.status,
+                            statusText: response.statusText,
+                            detail: response.detail
+                        });
+                        this.error = error;
+                        return Promise.reject(error);
+                    }
+                    return json;
+                });
+        },
+        open () {
+            document.body.appendChild(this.$refs.modalWrapper);
+            window.setTimeout(() => {
+                this.$refs.modal.classList.add('show');    
+            }, 100);
+                
+            this.isOpen = true;
+        },
+        close () {
+            this.$refs.modal.classList.remove('show');
+            window.setTimeout(() => {
+                this.$refs.modalTemplate.appendChild(this.$refs.modalWrapper);
+            }, 300);
+            this.isOpen = false;
         }
+    },
+    components: {
+        	Multiselect
     }
-    function groupSort (a, b) {
-        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-    }
-    function permissionSort (a, b) {
-        return a.alias.toLowerCase().localeCompare(b.alias.toLowerCase());
-    }
+}
+function groupSort (a, b) {
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+}
+function permissionSort (a, b) {
+    return a.alias.toLowerCase().localeCompare(b.alias.toLowerCase());
+}
 </script>
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

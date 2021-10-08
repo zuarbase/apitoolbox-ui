@@ -43,74 +43,74 @@
     </div>
 </template>
 <script>
-    import GroupEditModal from '../GroupEditModal/GroupEditModal.vue';
-    import '../../filters/date-time-format.filter.js';
-    export default {
-        name: 'GroupView',
-        props: {
-            server: String,
-            groupId: String
-        },
-        data: () => {
-            return {
-                openModal: false,
-                group: {},
-                permissions: []
-            };
-        },
-        created () {
-            // TODO - this group
-            document.addEventListener('group-edited.at', (e, p) => {
-                console.debug('group-edited.at', e);
-                // Object.assign(this.users.find(user => user.id === e.detail.user.id), e.detail.user);
-            });
-        },
-        watch: {
-            groupId: function (val) {
-                if (val) {
-                    this.fetchGroup();
-                    this.fetchGroupPermissions();
-                }
+import GroupEditModal from '../GroupEditModal/GroupEditModal.vue';
+import '../../filters/date-time-format.filter.js';
+export default {
+    name: 'GroupView',
+    props: {
+        server: String,
+        groupId: String
+    },
+    data: () => {
+        return {
+            openModal: false,
+            group: {},
+            permissions: []
+        };
+    },
+    created () {
+        // TODO - this group
+        document.addEventListener('group-edited.at', (e, p) => {
+            console.debug('group-edited.at', e);
+            // Object.assign(this.users.find(user => user.id === e.detail.user.id), e.detail.user);
+        });
+    },
+    watch: {
+        groupId: function (val) {
+            if (val) {
+                this.fetchGroup();
+                this.fetchGroupPermissions();
             }
-        },
-        methods: {
-            fetchGroup () {
-                fetch(`${this.server}/auth/groups/${this.groupId}`)
-                    .then(this.handleResponse)
-                    .then(group => {
-                        this.group = group;
-                    });
-            },
-            fetchGroupPermissions () {
-                fetch(`${this.server}/auth/groups/${this.groupId}/permissions`)
-                    .then(this.handleResponse)
-                    .then(permissions => {
-                        this.permissions = permissions;
-                        console.debug('permissions', this.permissions);
-                    });
-            },
-            handleResponse (response) {
-                return response.json()
-                    .then((json) => {
-                        if (!response.ok) {
-                            const error = Object.assign({}, json, {
-                                status: response.status,
-                                statusText: response.statusText,
-                            });
-                            return Promise.reject(error);
-                        }
-                        return json;
-                    });
-            },
-            onEditClick () {
-                this.openModal = false;
-                window.setTimeout(() => {
-                    this.openModal = true;
+        }
+    },
+    methods: {
+        fetchGroup () {
+            fetch(`${this.server}/auth/groups/${this.groupId}`)
+                .then(this.handleResponse)
+                .then(group => {
+                    this.group = group;
                 });
-            }
         },
-        components: {GroupEditModal}
-    }
+        fetchGroupPermissions () {
+            fetch(`${this.server}/auth/groups/${this.groupId}/permissions`)
+                .then(this.handleResponse)
+                .then(permissions => {
+                    this.permissions = permissions;
+                    console.debug('permissions', this.permissions);
+                });
+        },
+        handleResponse (response) {
+            return response.json()
+                .then((json) => {
+                    if (!response.ok) {
+                        const error = Object.assign({}, json, {
+                            status: response.status,
+                            statusText: response.statusText,
+                        });
+                        return Promise.reject(error);
+                    }
+                    return json;
+                });
+        },
+        onEditClick () {
+            this.openModal = false;
+            window.setTimeout(() => {
+                this.openModal = true;
+            });
+        }
+    },
+    components: { GroupEditModal }
+}
 </script>
 
 <style lang="scss">

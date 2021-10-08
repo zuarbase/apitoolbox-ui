@@ -36,7 +36,7 @@
                                                     placeholder="Permissions"
                                                     label="alias"
                                                     track-by="id"
-                                                    :multiple="true" 
+                                                    :multiple="true"
                                                     :taggable="false">
                                                 </multiselect>
                                             </div>
@@ -65,7 +65,7 @@
 <script>
 import Multiselect from 'vue-multiselect';
 export default {
-    name: "GroupEditModal",
+    name: 'GroupEditModal',
     props: {
         server: {
             type: String,
@@ -84,7 +84,7 @@ export default {
         };
     },
     watch: {
-        openModal: function(val) {
+        openModal: function (val) {
             if (val === this.isOpen) {
                 // Already in requested state
                 return;
@@ -109,10 +109,10 @@ export default {
         }
     },
     methods: {
-        onCancelClick() {
+        onCancelClick () {
             this.close();
         },
-        onSaveClick() {
+        onSaveClick () {
             if (this.$refs.form.checkValidity() === false) {
                 this.$refs.form.classList.add('was-validated');
                 return;
@@ -179,17 +179,17 @@ export default {
             let request;
             if (this.groupId) {
                 request = fetch(`${this.server}/auth/groups/${this.groupId}`, {
-                    method: "PUT",
+                    method: 'PUT',
                     headers: {
-                        "Content-Type": "application/json"
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(group)
                 });
             } else {
                 request = fetch(`${this.server}/auth/groups`, {
-                    method: "POST",
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json"
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(group)
                 });
@@ -202,7 +202,7 @@ export default {
                 });
         },
         saveGroupPermissions () {
-            let requests = [];
+            const requests = [];
             this.selectedPermissions.forEach(selectedPermission => {
                 if (!this.initialPermissions.find(ip => ip.id === selectedPermission.id)) {
                     requests.push(this.grantGroupPermission(selectedPermission));
@@ -217,19 +217,19 @@ export default {
         },
         grantGroupPermission (permission) {
             return fetch(`${this.server}/auth/groups/${this.groupId}/permissions`, {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({permission_id: permission.id})
-                })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ permission_id: permission.id })
+            })
                 .then(this.handleResponse);
         },
         revokeGroupPermission (permission) {
             return fetch(`${this.server}/auth/groups/${this.groupId}/permissions/${permission.id}`, {
-                    method: 'DELETE',
-                    headers: {'Content-Type': 'application/json'}
-                })
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            })
                 .then(this.handleResponse);
         },
         handleResponse (response) {
@@ -248,9 +248,8 @@ export default {
         open () {
             document.body.appendChild(this.$refs.modalWrapper);
             window.setTimeout(() => {
-                this.$refs.modal.classList.add('show');    
+                this.$refs.modal.classList.add('show');
             }, 100);
-            
             this.isOpen = true;
         },
         close () {
