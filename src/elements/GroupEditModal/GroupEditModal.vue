@@ -2,7 +2,7 @@
     <div v-show="false" ref="modalTemplate">
         <div class="modal-window group-edit-modal" ref="modalWrapper">
             <div class="modal fade" ref="modal">
-                <div class="modal-dialog modal-md modal-dialog-scrollable">
+                <div class="modal-dialog modal-md">
                     <div class="modal-content">
                         <header class="modal-header">
                             <h3 v-if="!groupId">Add Group</h3>
