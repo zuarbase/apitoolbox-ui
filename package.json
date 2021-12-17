@@ -1,6 +1,6 @@
 {
   "name": "apitoolbox-ui",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "scripts": {
     "dev": "webpack-dev-server --config ./webpack.config.js --open --mode=development",
     "dev-build": "rollup --config rollup.config.js --watch",
@@ -35,7 +35,7 @@
     "@vue/test-utils": "1.0.0-beta.31",
     "babel-eslint": "^10.1.0",
     "chai": "^4.1.2",
-    "chromedriver": "80",
+    "chromedriver": "^96.0.0",
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-node": "^11.1.0",
