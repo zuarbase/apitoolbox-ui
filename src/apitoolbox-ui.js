@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueCustomElement from 'vue-custom-element';
 
 import BackgroundVisual from './elements/BackgroundVisual/BackgroundVisual.vue';
+import ConfirmationModal from './elements/ConfirmationModal/ConfirmationModal.vue';
 import GroupEditModal from './elements/GroupEditModal/GroupEditModal.vue';
 import GroupList from './elements/GroupList/GroupList.vue';
 import GroupView from './elements/GroupView/GroupView.vue';
@@ -18,6 +19,7 @@ import UserView from './elements/UserView/UserView.vue';
 
 Vue.use(VueCustomElement);
 Vue.customElement('background-visual', BackgroundVisual);
+Vue.customElement('confirmation-modal', ConfirmationModal);
 Vue.customElement('group-edit-modal', GroupEditModal);
 Vue.customElement('group-list', GroupList);
 Vue.customElement('group-view', GroupView);
@@ -34,6 +36,7 @@ Vue.customElement('user-view', UserView);
 
 export {
     BackgroundVisual,
+    ConfirmationModal,
     GroupEditModal,
     GroupList,
     GroupView,

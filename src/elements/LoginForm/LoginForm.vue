@@ -42,9 +42,9 @@
                     class="btn btn-primary btn-lg btn-block">{{buttonText}}</button>
             </div>
 
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <a href v-on:click.prevent="showForgotPassword=true" :style="linkSyle">Forgot password?</a>
-            </div>
+            </div> -->
         </form>
 
         <!-- Forgot Password -->

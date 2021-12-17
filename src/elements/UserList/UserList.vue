@@ -41,10 +41,12 @@
             :open-modal="openModal" 
             :on-close="onModalClose">
         </user-edit-modal>
+        <confirmation-modal ref="confirmationModal"></confirmation-modal>
     </div>
 </template>
 <script>
     import UserEditModal from '../UserEditModal/UserEditModal.vue'
+    import ConfirmationModal from '../ConfirmationModal/ConfirmationModal.vue'
     export default {
         name: 'UserList',
         props: {
@@ -116,22 +118,31 @@
                 this.$el.parentNode.dispatchEvent(event);
             },
             onDeleteClick (user) {
-                fetch(`${this.server}/auth/users/${user.id}`,{
-                    method:'DELETE'
+                this.$refs.confirmationModal.confirm({
+                    heading:'Remove user',
+                    body:`Confirm removing user ${user.username}`
+                }).then(() => {
+                    fetch(`${this.server}/auth/users/${user.id}`,{
+                        method:'DELETE'
+                    })
+                    .then(() => {
+                        this.users = this.users.filter(usr=>usr.id !== user.id);
+                    })
+                    .catch(err => {
+                        this.loading = false;
+                        console.debug('Error removing user or parsing response', err)
+                    })
                 })
-                .then(() => {
-                    this.users = this.users.filter(usr=>usr.id !== user.id);
-                })
-                .catch(err => {
-                    this.loading = false;
-                    console.debug('Error removing user or parsing response', err)
-                })
+                .catch(() =>{});
             },
             onModalClose () {
                 this.openModal = false;
             }
         },
-        components: {UserEditModal}
+        components: {
+            UserEditModal,
+            ConfirmationModal
+        }
     }
 
     function userSort (a, b) {
