@@ -57,6 +57,7 @@ Clone the repo and run `yarn examples`
 * `yarn build`
 
 ## Publish to NPM
+* Update version in package.json
 * `yarn build`
 * `cp package.json dist`
 * `cd dist`
