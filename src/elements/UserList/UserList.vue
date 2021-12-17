@@ -119,7 +119,7 @@
             },
             onDeleteClick (user) {
                 this.$refs.confirmationModal.confirm({
-                    title:'Remove user',
+                    heading:'Remove user',
                     body:`Confirm removing user ${user.username}`
                 }).then(() => {
                     fetch(`${this.server}/auth/users/${user.id}`,{

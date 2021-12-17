@@ -5,13 +5,13 @@
                 <div class="modal-dialog modal-md modal-dialog-scrollable">
                     <div class="modal-content">
                         <header class="modal-header">
-                            <h3>{{ title }}</h3>
+                            <h3>{{ headingLocal }}</h3>
                         </header>
                         <main class="modal-body">
                             <div class="container-fluid">
                                 <div class="row">
                                     <div class="col">
-                                        {{ body }}
+                                        {{ bodyLocal }}
                                     </div>
                                 </div>
                             </div>
@@ -21,13 +21,13 @@
                                 v-on:click="onCancelClick"
                                 class="btn btn-secondary"
                             >
-                                {{ cancelBtn }}
+                                {{ cancelBtnTextLocal }}
                             </button>
                             <button
                                 v-on:click="onConfirmClick"
                                 class="btn btn-primary"
                             >
-                                {{ confirmBtn }}
+                                {{ confirmBtnTextLocal }}
                             </button>
                         </footer>
                     </div>
@@ -42,23 +42,43 @@ export default {
     name: "ConfirmationModal",
     data: () => {
         return {
-            title: "Confirm",
-            body: "Confirm your action.",
-            confirmBtn: "Ok",
-            cancelBtn: "Cancel",
-
-            isOpen: false, // Actual modal state
+            headingLocal: "",
+            bodyLocal: "",
+            confirmBtnTextLocal: "",
+            cancelBtnTextLocal: "",
             resolve: null,
             reject: null,
         };
     },
+    props: {
+        openModal: {
+            type: Boolean,
+            default: false,
+        },
+        heading: {
+            type: String,
+            default: "Confirm",
+        },
+        body: {
+            type: String,
+            default: "Confirm your action.",
+        },
+        confirmBtnText: {
+            type: String,
+            default: "Ok",
+        },
+        cancelBtnText: {
+            type: String,
+            default: "Cancel",
+        },
+    },
     methods: {
         // Interface
-        confirm({ title, body, confirmBtn, cancelBtn } = {}) {
-            this.title = title || this.title;
-            this.body = body || this.body;
-            this.confirmBtn = confirmBtn || this.confirmBtn;
-            this.cancelBtn = cancelBtn || this.cancelBtn;
+        confirm({ heading, body, confirmBtnText, cancelBtnText } = {}) {
+            this.headingLocal = heading || this.heading;
+            this.bodyLocal = body || this.body;
+            this.confirmBtnTextLocal = confirmBtnText || this.confirmBtnText;
+            this.cancelBtnTextLocal = cancelBtnText || this.cancelBtnText;
             this.promise = new Promise((resolve, reject) => {
                 this.resolve = resolve;
                 this.reject = reject;
@@ -69,10 +89,12 @@ export default {
         // Local Methods
         onCancelClick() {
             this.close();
+            this.$emit("result", {confirmed:false});
             this.reject();
         },
         onConfirmClick() {
             this.close();
+            this.$emit("result", {confirmed:true});
             this.resolve();
         },
         open() {
@@ -80,24 +102,25 @@ export default {
             window.setTimeout(() => {
                 this.$refs.modal.classList.add("show");
             }, 100);
-
-            this.isOpen = true;
         },
         close() {
             this.$refs.modal.classList.remove("show");
             window.setTimeout(() => {
                 this.$refs.modalTemplate.appendChild(this.$refs.modalWrapper);
-                this.reset()
+                this.reset();
             }, 300);
-            this.isOpen = false;
         },
         reset() {
-            this.title = "Confirm";
-            this.title = "Confirm your action.";
-            this.confirmBtn = "Ok";
-            this.cancelBtn = "Cancel";
-
-            this.promise = null;
+             this.promise = null;
+        },
+    },
+    watch: {
+        openModal: function (val) {
+            if (val) {
+                this.confirm();
+            } else {
+                this.onCancelClick();
+            }
         },
     },
 };

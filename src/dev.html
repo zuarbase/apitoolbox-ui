@@ -207,20 +207,29 @@
             <h2 class="widget-name">Confirmation Modal</h2>
             <div class="user-list__widget-wrapper">
                 <script>
-                    function testConfirmation () {
-                        document.querySelector('#confirm').getVueInstance()
-                        .confirm({
-                            title:'Custom title',
-                            body:'Custom body',
-                            confirmBtn:'Custom confirmBtn',
-                            cancelBtn:'Custom cancelBtn',
-                        })
-                        .then(() => alert('Confirmed'))
-                        .catch(() => alert('Rejected'));
+                    function handleConfirmResult (event) {
+                        if (event.detail[0].confirmed){
+                            alert('Confirmed!');
+                        } else {
+                            alert('Rejected!');
+                        }
+
+                        let confirmModal = document.querySelector('#confirm');
+                        confirmModal.removeEventListener('result', handleConfirmResult)
+                    }
+
+                    function toggleConfirmation () {
+                        let confirmModal = document.querySelector('#confirm');
+                        if (confirmModal.getAttribute('open-modal') === 'true') {
+                            confirmModal.setAttribute('open-modal', false);
+                        } else {
+                            confirmModal.setAttribute('open-modal', true);
+                            confirmModal.addEventListener('result', handleConfirmResult)
+                        }
                     }
                 </script>
-                <button onclick="testConfirmation()">Confirm</button>
-                <confirmation-modal id="confirm"></confirmation-modal>
+                <button onclick="toggleConfirmation()">Confirm</button>
+                <confirmation-modal id="confirm" open-modal="false"></confirmation-modal>
             </div>
         </div>
 
