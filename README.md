@@ -57,6 +57,8 @@ Clone the repo and run `yarn examples`
 * `yarn build`
 
 ## Publish to NPM
+This step requires the user to be logged in to NPM as Dylan since the package is published under Dylan's account. To login run `npm login`. A 2FA code will be required to login.
+
 * Update version in package.json
 * `yarn build`
 * `cp package.json dist`

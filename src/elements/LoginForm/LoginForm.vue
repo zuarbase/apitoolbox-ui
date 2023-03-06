@@ -175,8 +175,8 @@ export default {
                     if (response.status === 401) {
                         this.authError = true
                     } else if (response.ok) {
-                        // Success
-                        window.location.href = response.url
+                        // Success - 302
+                        window.location.href = loc || '/'
                     } else {
                         response.json().then(json => {
                             json.detail.forEach(error => {
