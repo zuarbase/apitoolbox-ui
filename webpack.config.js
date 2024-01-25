@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
@@ -8,7 +9,9 @@ module.exports = {
         index: './src/apitoolbox-ui.js'
     },
     devServer: {
-        contentBase: path.join(__dirname, 'dist'),
+        static: {
+            directory: path.join(__dirname, 'dist'),
+        },
         port: 9101
     },
     devtool: 'source-map',
@@ -36,6 +39,9 @@ module.exports = {
         new VueLoaderPlugin(),
         new HtmlWebpackPlugin({
             template: 'src/dev.html'
+        }),
+        new webpack.DefinePlugin({
+            'process.env.BUILD': "'WEB'" // Vuelidate uses this
         })
     ]
 };

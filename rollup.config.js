@@ -56,7 +56,7 @@ const plugins = [
 
 const config = {
     output: {
-        dir: 'dist',
+        dir: '../custom-portal/dev/private/admin/js',
         format: 'iife'
     },
     plugins

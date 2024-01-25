@@ -29,7 +29,7 @@
                             <td>
                                 <button class="btn btn-secondary btn-small" v-on:click="onViewClick(user.id)">View</button>
                                 <button class="btn btn-secondary btn-small" v-on:click="onEditClick(user)">Edit</button>
-                                <button class="btn btn-secondary btn-small" v-on:click="onDeleteClick(user)">Delete</button>
+                                <button class="btn btn-danger btn-small" v-on:click="onDeleteClick(user)">Delete</button>
                             </td>
                         </tr>
                     </tbody>
@@ -106,7 +106,6 @@
                 });
             },
             onEditClick (user) {
-                console.debug('edit click', user);
                 this.userToEdit = user;
                 this.openModal = false;
                 window.setTimeout(() => {

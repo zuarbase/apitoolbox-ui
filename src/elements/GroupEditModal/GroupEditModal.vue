@@ -13,7 +13,7 @@
                                 <div class="row">
                                     <div class="col">
                                         <form class="form needs-validation" ref="form" novalidate>
-                                            <div class="form-group">
+                                            <div class="mb-3">
                                                 <label for="name">Name</label>
                                                 <input
                                                     type="text"
@@ -26,7 +26,7 @@
                                                     :required="true">
                                                 <div class="invalid-feedback">Please provide a group name. Eg; Editor.</div>
                                             </div>
-                                            <div class="form-group">
+                                            <div class="mb-3">
                                                 <label for="permissions">Permissions</label>
                                                 <multiselect 
                                                     v-model="selectedPermissions" 

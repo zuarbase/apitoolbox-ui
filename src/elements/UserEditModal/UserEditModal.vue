@@ -17,8 +17,8 @@
                                             novalidate
                                             ref="form">
 
-                                            <div class="form-group">
-                                                <label for="name">Full Name</label>
+                                            <div class="mb-3">
+                                                <label for="name" class="form-label">Full Name</label>
                                                 <input 
                                                     type="text" 
                                                     class="form-control" 
@@ -30,8 +30,8 @@
                                                     required />
                                             </div>
 
-                                            <div class="form-group">
-                                                <label for="username">Username</label>
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Username</label>
                                                 <input 
                                                     type="text" 
                                                     class="form-control" 
@@ -45,8 +45,8 @@
                                                     <div class="invalid-feedback">Please provide a username</div>
                                             </div>
 
-                                            <div class="form-group">
-                                                <label for="email">Password</label>
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">Password</label>
                                                 <input 
                 				                    type="password" 
                 				                    class="form-control"
@@ -61,8 +61,8 @@
                                                     <div class="invalid-feedback">Password must be at least 6 characters in length</div>
                                             </div>
 
-                                            <div class="form-group">
-                                                <label for="email">Email</label>
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">Email</label>
                                                 <input 
                                                     type="email" 
                                                     class="form-control" 
@@ -76,7 +76,7 @@
                                                     <div class="invalid-feedback">Please provide a valid email address</div>
                                             </div>
 
-                                            <!-- <div class="form-group">
+                                            <!-- <div class="mb-3">
                                                 <label for="username"> 
                                                     <span v-if="userId">Reset Password (optional)</span>
                                                     <span v-if="!userId">Password</span>
@@ -105,8 +105,8 @@
                 			                    <div class="invalid-feedback">Passwords must match</div>
                 				            </div> -->
 
-                				            <!-- <div class="form-group-row" v-if="isOpen">
-                					            <div class="form-group">
+                				            <div class="mb-3-row" v-if="isOpen">
+                					            <div class="mb-3">
                                                     <label for="groups">Groups</label>
                 	                                <multiselect 
                 	                                	v-model="selectedGroups"
@@ -120,7 +120,9 @@
                 	                                	:taggable="false" 
                 	                                	@tag="addGroup"></multiselect>
                 	                            </div>
-                					            <div class="form-group">
+                                            </div>
+                                            <!-- 
+                					            <div class="mb-3">
                                                     <label for="permissions">Permissions</label>
                 	                                <multiselect 
                 	                                	v-model="selectedPermissions" 
@@ -136,7 +138,7 @@
                 	                            </div>
                                             </div> -->
 
-                                            <div class="form-group">
+                                            <div class="mb-3">
                                                 <div class="form-check form-check-inline">
                                                     <label class="form-check-label">
                                                         <input 
@@ -218,12 +220,12 @@
                 	this.selectedGroups.length = 0;
                 	this.selectedPermissions.length = 0;
                     
-                    // this.fetchGroups();
+                    this.fetchGroups();
                     // this.fetchPermissions();
                     
                     if (this.userId) {
                         this.fetchUser();
-                        // this.fetchUserGroups();
+                        this.fetchUserGroups();
                         // this.fetchUserPermissions();
                     }
 
